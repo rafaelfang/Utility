@@ -21,7 +21,7 @@ public:
 	void write2Json();
 	void setup3DCoords();
 	void findLocalAlign();
-	void findGlobalAlign(int);
+	void findGlobalAlign();
 	virtual ~BLAPDBImpl();
 private:
 	vector<BLAPDBResult> resultVector;

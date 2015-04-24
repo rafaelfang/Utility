@@ -396,7 +396,7 @@ void BLAPDBImpl::findLocalAlign() {
 
 	}
 }
-void BLAPDBImpl::findGlobalAlign(int queryLength) {
+void BLAPDBImpl::findGlobalAlign() {
 	string proteinName;
 	int subjectStart;
 	string subject;
@@ -413,7 +413,7 @@ void BLAPDBImpl::findGlobalAlign(int queryLength) {
 		subject = resultVector[i].getSubject();
 		subjectEnd = resultVector[i].getSubjectEnd();
 		int headMore = queryStart - 1;
-		int tailMore = queryLength - queryEnd;
+		int tailMore = proteinSeqLength - queryEnd;
 		vector<float> Xs = resultVector[i].getXCoords();
 		vector<float> Ys = resultVector[i].getYCoords();
 		vector<float> Zs = resultVector[i].getZCoords();
