@@ -1,7 +1,7 @@
 {
 	"DBInfoLocation":"/home/lihongb/DATABASE/DBInfo/",
 	"inputFileLocation":"/home/cf797/test/queryFolder/",
-	"outputFileLocation":"/home/cf797/test/outputResultFolder/"
-	
+	"outputFileLocation":"/home/cf797/test/outputResultFolder/",
+	"proteinLocation": "/home/cf797/test/Proteins/"
   
 }
