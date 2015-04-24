@@ -20,10 +20,12 @@ public:
 	virtual void write2Json()=0;
 	virtual void setup3DCoords()=0;
 	virtual void findLocalAlign()=0;
-	virtual void findGlobalAlign(int)=0;
+	virtual void findGlobalAlign()=0;
 	virtual ~UtilityInterface();
 	char* getRootName();
 	void setRootName(char* rootName);
+	void findProteinSeqLength();
+
 
 protected:
 
@@ -31,6 +33,8 @@ protected:
 	string inputFileLocation;
 	string outputFileLocation;
 	string DBInfoLocation;
+	string proteinLocation;
+	int proteinSeqLength;
 };
 
 #endif /* UTILITYINTERFACE_H_ */
