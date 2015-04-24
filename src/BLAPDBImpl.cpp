@@ -53,6 +53,9 @@ void BLAPDBImpl::populateResultVector() {
 	char line[500];
 	int counter = 0;
 	string inFilename(inputFileLocation);
+	inFilename += "/";
+	inFilename += rootName;
+	inFilename += "/";
 	inFilename += "/query.blaPDB";
 
 	FILE* fptr = fopen((char*) inFilename.c_str(), "r");
@@ -447,12 +450,11 @@ void BLAPDBImpl::findGlobalAlign() {
 			}
 
 		}
-		if(tailMore>0){
-			for (int k=1;k<tailMore;k++){
-				outJsonFile << "\"" << "t" << "\":\""
-										<< Xs[subjectEnd+k] << ","
-										<< Ys[subjectEnd+k] << ","
-										<< Zs[subjectEnd+k] << "\"\n";
+		if (tailMore > 0) {
+			for (int k = 1; k < tailMore; k++) {
+				outJsonFile << "\"" << "t" << "\":\"" << Xs[subjectEnd + k]
+						<< "," << Ys[subjectEnd + k] << ","
+						<< Zs[subjectEnd + k] << "\"\n";
 			}
 		}
 		outJsonFile << "}\n";
