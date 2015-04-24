@@ -15,13 +15,13 @@
 using namespace std;
 
 int main(int argc, char* argv[]) {
-	if (argc != 4) {
+	if (argc != 3) {
 		cout << "not enough arguments" << endl;
-		cout << "<executable> <type>" << endl;
+		cout << "<executable> <type> <proteinName>" << endl;
 
 	}
 
-	// -blaPDB T0659 64
+	// -blaPDB T0837
 	if (strcmp(argv[1], "-blaPDB") == 0) {
 		BLAPDBImpl blaPDBImpl(argv[2]);
 		blaPDBImpl.populateResultVector();
@@ -29,7 +29,7 @@ int main(int argc, char* argv[]) {
 		blaPDBImpl.write2Json();
 		blaPDBImpl.setup3DCoords();
 		blaPDBImpl.findLocalAlign();
-		blaPDBImpl.findGlobalAlign(atoi(argv[3]));
+		blaPDBImpl.findGlobalAlign();
 	}
 
 	return 0;
