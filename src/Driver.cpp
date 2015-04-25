@@ -6,11 +6,12 @@
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 
-#include <stdio.h>
+#include <cstring>
 #include <iostream>
 
-#include "BLAPDBImpl.h"
 #include "BLANRImpl.h"
+#include "BLAPDBImpl.h"
+#include "HHRImpl.h"
 
 using namespace std;
 
@@ -43,5 +44,15 @@ int main(int argc, char* argv[]) {
 		//blaPDBImpl.findGlobalAlign();
 	}
 
+	// -hhr T0837
+	if (strcmp(argv[1], "-hhr") == 0) {
+		HHRImpl hhrImpl(argv[2]);
+		hhrImpl.populateResultVector();
+		hhrImpl.makeDirectory();
+		hhrImpl.write2Json();
+		hhrImpl.setup3DCoords();
+		hhrImpl.findLocalAlign();
+		hhrImpl.findGlobalAlign();
+	}
 	return 0;
 }
