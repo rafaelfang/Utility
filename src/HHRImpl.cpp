@@ -197,7 +197,7 @@ void HHRImpl::write2Json() {
 	outFilename += rootName;
 	outFilename += "/";
 	outFilename += "hhr.json";
-	cout<<outFilename<<endl;
+	cout << outFilename << endl;
 	ofstream outputFile(outFilename.c_str());
 
 	outputFile << "{" << "\n";
@@ -306,14 +306,14 @@ void HHRImpl::setup3DCoords() {
 
 void HHRImpl::findLocalAlign() {
 	string proteinName;
-	int subjectStart;
-	string subject;
-	int subjectEnd;
+	int targetStart;
+	string target;
+	int targetEnd;
 	for (int i = 0; i < hhrResultVector.size(); i++) {
 		proteinName = hhrResultVector[i].getProteinName();
-		subjectStart = hhrResultVector[i].getQueryStart();
-		subject = hhrResultVector[i].getQuery();
-		subjectEnd = hhrResultVector[i].getQueryEnd();
+		targetStart = hhrResultVector[i].getTargetStart();
+		target = hhrResultVector[i].getTarget();
+		targetEnd = hhrResultVector[i].getTargetEnd();
 		vector<float> Xs = hhrResultVector[i].getXCoords();
 		vector<float> Ys = hhrResultVector[i].getYCoords();
 		vector<float> Zs = hhrResultVector[i].getZCoords();
@@ -323,21 +323,21 @@ void HHRImpl::findLocalAlign() {
 		protein3DCorrdsFilename += "/local/";
 		protein3DCorrdsFilename += proteinName;
 		protein3DCorrdsFilename += "_";
-		protein3DCorrdsFilename += subject;
+		protein3DCorrdsFilename += target;
 		protein3DCorrdsFilename += ".json";
 		ofstream outJsonFile((char*) protein3DCorrdsFilename.c_str(), ios::out);
 		outJsonFile << "{\n";
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
-		for (int j = 1; j <= subject.size(); j++) {
-			if (subject[j] == '-') {
-				outJsonFile << "\"" << subject[j] << "\":\""
+		for (int j = 1; j <= target.size(); j++) {
+			if (target[j] == '-') {
+				outJsonFile << "\"" << target[j] << "\":\""
 						<< "10000,10000,10000\"\n";
 			} else {
 
-				outJsonFile << "\"" << subject[j - 1] << "\":\""
-						<< Xs[subjectStart + j - 1] << ","
-						<< Ys[subjectStart + j - 1] << ","
-						<< Zs[subjectStart + j - 1] << "\"\n";
+				outJsonFile << "\"" << target[j - 1] << "\":\""
+						<< Xs[targetStart + j - 1] << ","
+						<< Ys[targetStart + j - 1] << ","
+						<< Zs[targetStart + j - 1] << "\"\n";
 			}
 
 		}
@@ -348,22 +348,22 @@ void HHRImpl::findLocalAlign() {
 }
 void HHRImpl::findGlobalAlign() {
 	string proteinName;
-	int subjectStart;
-	string subject;
-	int subjectEnd;
 	int queryStart;
 	string query;
 	int queryEnd;
+	int targetStart;
+	string target;
+	int targetEnd;
 	for (int i = 0; i < hhrResultVector.size(); i++) {
 		proteinName = hhrResultVector[i].getProteinName();
 		queryStart = hhrResultVector[i].getQueryStart();
 		query = hhrResultVector[i].getQuery();
 		queryEnd = hhrResultVector[i].getQueryEnd();
-		subjectStart = hhrResultVector[i].getTargetStart();
-		subject = hhrResultVector[i].getTarget();
-		subjectEnd = hhrResultVector[i].getTargetEnd();
-		int headMore = queryStart - 1;
-		int tailMore = proteinSeqLength - queryEnd;
+		targetStart = hhrResultVector[i].getTargetStart();
+		target = hhrResultVector[i].getTarget();
+		targetEnd = hhrResultVector[i].getTargetEnd();
+		int headMore = targetStart - 1;
+		int tailMore = proteinSeqLength - targetEnd;
 		vector<float> Xs = hhrResultVector[i].getXCoords();
 		vector<float> Ys = hhrResultVector[i].getYCoords();
 		vector<float> Zs = hhrResultVector[i].getZCoords();
@@ -373,35 +373,35 @@ void HHRImpl::findGlobalAlign() {
 		protein3DCorrdsFilename += "/Global/";
 		protein3DCorrdsFilename += proteinName;
 		protein3DCorrdsFilename += "_";
-		protein3DCorrdsFilename += subject;
+		protein3DCorrdsFilename += target;
 		protein3DCorrdsFilename += ".json";
 		ofstream outJsonFile((char*) protein3DCorrdsFilename.c_str(), ios::out);
 		outJsonFile << "{\n";
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
 		while (headMore > 0) {
-			outJsonFile << "\"" << "h" << "\":\"" << Xs[subjectStart - headMore]
-					<< "," << Ys[subjectStart - headMore] << ","
-					<< Zs[subjectStart - headMore] << "\"\n";
+			outJsonFile << "\"" << "h" << "\":\"" << Xs[targetStart - headMore]
+					<< "," << Ys[targetStart - headMore] << ","
+					<< Zs[targetStart - headMore] << "\"\n";
 			headMore--;
 		}
-		for (int j = 1; j <= subject.size(); j++) {
-			if (subject[j] == '-') {
-				outJsonFile << "\"" << subject[j] << "\":\""
+		for (int j = 1; j <= target.size(); j++) {
+			if (target[j] == '-') {
+				outJsonFile << "\"" << target[j] << "\":\""
 						<< "10000,10000,10000\"\n";
 			} else {
 
-				outJsonFile << "\"" << subject[j - 1] << "\":\""
-						<< Xs[subjectStart + j - 1] << ","
-						<< Ys[subjectStart + j - 1] << ","
-						<< Zs[subjectStart + j - 1] << "\"\n";
+				outJsonFile << "\"" << target[j - 1] << "\":\""
+						<< Xs[targetStart + j - 1] << ","
+						<< Ys[targetStart + j - 1] << ","
+						<< Zs[targetStart + j - 1] << "\"\n";
 			}
 
 		}
 		if (tailMore > 0) {
 			for (int k = 1; k < tailMore; k++) {
-				outJsonFile << "\"" << "t" << "\":\"" << Xs[subjectEnd + k]
-						<< "," << Ys[subjectEnd + k] << ","
-						<< Zs[subjectEnd + k] << "\"\n";
+				outJsonFile << "\"" << "t" << "\":\"" << Xs[targetEnd + k]
+						<< "," << Ys[targetEnd + k] << "," << Zs[targetEnd + k]
+						<< "\"\n";
 			}
 		}
 		outJsonFile << "}\n";
