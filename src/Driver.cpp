@@ -6,11 +6,11 @@
 // Description : Hello World in C++, Ansi-style
 //============================================================================
 
-#include <cstdlib>
-#include <cstring>
+#include <stdio.h>
 #include <iostream>
 
 #include "BLAPDBImpl.h"
+#include "BLANRImpl.h"
 
 using namespace std;
 
@@ -30,6 +30,17 @@ int main(int argc, char* argv[]) {
 		blaPDBImpl.setup3DCoords();
 		blaPDBImpl.findLocalAlign();
 		blaPDBImpl.findGlobalAlign();
+	}
+
+	// -blaNR T0837
+	if (strcmp(argv[1], "-blaNR") == 0) {
+		BLANRImpl blaNRImpl(argv[2]);
+		blaNRImpl.populateResultVector();
+		blaNRImpl.makeDirectory();
+		blaNRImpl.write2Json();
+		//blaPDBImpl.setup3DCoords();
+		//blaPDBImpl.findLocalAlign();
+		//blaPDBImpl.findGlobalAlign();
 	}
 
 	return 0;
