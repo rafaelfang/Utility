@@ -24,7 +24,7 @@ public:
 	void findGlobalAlign();
 	virtual ~BLAPDBImpl();
 private:
-	vector<BLAPDBResult> resultVector;
+	vector<BLAPDBResult> blaPDBResultVector;
 
 };
 

@@ -7,10 +7,9 @@
 
 #include "BLAPDBImpl.h"
 
-#include <cstdio>
+#include <stdio.h>
 #include <cstdlib>
 #include <cstring>
-#include <cwchar>
 #include <fstream>
 #include <iostream>
 #include <string>
@@ -177,7 +176,7 @@ void BLAPDBImpl::populateResultVector() {
 			//aaaaaaaaaaaaaa
 			//aaaaaaaaaaaaaa
 			//aaaaaaaaaaaaaa
-			resultVector.push_back(result);
+			blaPDBResultVector.push_back(result);
 			counter++;
 			//then update the information and set the second state flag
 			float score;
@@ -222,7 +221,7 @@ void BLAPDBImpl::populateResultVector() {
 			//aaaaaaaaaaaaaa
 			//aaaaaaaaaaaaaa
 			//aaaaaaaaaaaaaa
-			resultVector.push_back(result);
+			blaPDBResultVector.push_back(result);
 			counter++;
 			//then update the information set the first state flag
 			char proteinName[7];
@@ -251,7 +250,7 @@ void BLAPDBImpl::populateResultVector() {
 	//aaaaaaaaaaaaaa
 	//aaaaaaaaaaaaaa
 
-	resultVector.push_back(result);
+	blaPDBResultVector.push_back(result);
 
 	fclose(fptr);
 
@@ -267,33 +266,33 @@ void BLAPDBImpl::write2Json() {
 
 	outputFile << "{" << "\n";
 
-	for (int i = 0; i < resultVector.size(); i++) {
+	for (int i = 0; i < blaPDBResultVector.size(); i++) {
 
 		outputFile << "\"protein" << i << "\":{\n";
-		outputFile << "\t\"proteinName\":\"" << resultVector[i].getProteinName()
+		outputFile << "\t\"proteinName\":\"" << blaPDBResultVector[i].getProteinName()
 				<< "\",\n";
-		outputFile << "\t\"Length\":\"" << resultVector[i].getLength()
+		outputFile << "\t\"Length\":\"" << blaPDBResultVector[i].getLength()
 				<< "\",\n";
-		outputFile << "\t\"Score\":\"" << resultVector[i].getScore() << "\",\n";
-		outputFile << "\t\"Expect\":\"" << resultVector[i].getExpect()
+		outputFile << "\t\"Score\":\"" << blaPDBResultVector[i].getScore() << "\",\n";
+		outputFile << "\t\"Expect\":\"" << blaPDBResultVector[i].getExpect()
 				<< "\",\n";
-		outputFile << "\t\"Identities\":\"" << resultVector[i].getIdentities()
+		outputFile << "\t\"Identities\":\"" << blaPDBResultVector[i].getIdentities()
 				<< "\",\n";
-		outputFile << "\t\"Positives\":\"" << resultVector[i].getPositives()
+		outputFile << "\t\"Positives\":\"" << blaPDBResultVector[i].getPositives()
 				<< "\",\n";
-		outputFile << "\t\"Gaps\":\"" << resultVector[i].getGaps() << "\",\n";
-		outputFile << "\t\"QueyStart\":\"" << resultVector[i].getQueryStart()
+		outputFile << "\t\"Gaps\":\"" << blaPDBResultVector[i].getGaps() << "\",\n";
+		outputFile << "\t\"QueyStart\":\"" << blaPDBResultVector[i].getQueryStart()
 				<< "\",\n";
-		outputFile << "\t\"Query\":\"" << resultVector[i].getQuery() << "\",\n";
-		outputFile << "\t\"QueryEnd\":\"" << resultVector[i].getQueryEnd()
+		outputFile << "\t\"Query\":\"" << blaPDBResultVector[i].getQuery() << "\",\n";
+		outputFile << "\t\"QueryEnd\":\"" << blaPDBResultVector[i].getQueryEnd()
 				<< "\",\n";
-		outputFile << "\t\"Alignment\":\"" << resultVector[i].getAlignment()
+		outputFile << "\t\"Alignment\":\"" << blaPDBResultVector[i].getAlignment()
 				<< "\",\n";
 		outputFile << "\t\"SubjectStart\":\""
-				<< resultVector[i].getSubjectStart() << "\",\n";
-		outputFile << "\t\"Subject\":\"" << resultVector[i].getSubject()
+				<< blaPDBResultVector[i].getSubjectStart() << "\",\n";
+		outputFile << "\t\"Subject\":\"" << blaPDBResultVector[i].getSubject()
 				<< "\",\n";
-		outputFile << "\t\"SubjectEnd\":\"" << resultVector[i].getSubjectEnd()
+		outputFile << "\t\"SubjectEnd\":\"" << blaPDBResultVector[i].getSubjectEnd()
 				<< "\"\n";
 		outputFile << "},\n";
 	}
@@ -305,10 +304,10 @@ void BLAPDBImpl::write2Json() {
 }
 
 void BLAPDBImpl::setup3DCoords() {
-	for (int i = 0; i < resultVector.size(); i++) {
+	for (int i = 0; i < blaPDBResultVector.size(); i++) {
 		string proteinDBFilename(DBInfoLocation);
 		proteinDBFilename += "/";
-		proteinDBFilename += resultVector[i].getProteinName();
+		proteinDBFilename += blaPDBResultVector[i].getProteinName();
 		proteinDBFilename += ".db";
 		FILE* fptr = fopen((char*) proteinDBFilename.c_str(), "r");
 		if (fptr == NULL) {
@@ -351,9 +350,9 @@ void BLAPDBImpl::setup3DCoords() {
 			}
 		}
 		fclose(fptr);
-		resultVector[i].setXCoords(Xs);
-		resultVector[i].setYCoords(Ys);
-		resultVector[i].setZCoords(Zs);
+		blaPDBResultVector[i].setXCoords(Xs);
+		blaPDBResultVector[i].setYCoords(Ys);
+		blaPDBResultVector[i].setZCoords(Zs);
 
 	}
 }
@@ -362,14 +361,14 @@ void BLAPDBImpl::findLocalAlign() {
 	int subjectStart;
 	string subject;
 	int subjectEnd;
-	for (int i = 0; i < resultVector.size(); i++) {
-		proteinName = resultVector[i].getProteinName();
-		subjectStart = resultVector[i].getSubjectStart();
-		subject = resultVector[i].getSubject();
-		subjectEnd = resultVector[i].getSubjectEnd();
-		vector<float> Xs = resultVector[i].getXCoords();
-		vector<float> Ys = resultVector[i].getYCoords();
-		vector<float> Zs = resultVector[i].getZCoords();
+	for (int i = 0; i < blaPDBResultVector.size(); i++) {
+		proteinName = blaPDBResultVector[i].getProteinName();
+		subjectStart = blaPDBResultVector[i].getSubjectStart();
+		subject = blaPDBResultVector[i].getSubject();
+		subjectEnd = blaPDBResultVector[i].getSubjectEnd();
+		vector<float> Xs = blaPDBResultVector[i].getXCoords();
+		vector<float> Ys = blaPDBResultVector[i].getYCoords();
+		vector<float> Zs = blaPDBResultVector[i].getZCoords();
 		string protein3DCorrdsFilename(outputFileLocation);
 		protein3DCorrdsFilename += "/";
 		protein3DCorrdsFilename += rootName;
@@ -407,19 +406,19 @@ void BLAPDBImpl::findGlobalAlign() {
 	int queryStart;
 	string query;
 	int queryEnd;
-	for (int i = 0; i < resultVector.size(); i++) {
-		proteinName = resultVector[i].getProteinName();
-		queryStart = resultVector[i].getQueryStart();
-		query = resultVector[i].getQuery();
-		queryEnd = resultVector[i].getQueryEnd();
-		subjectStart = resultVector[i].getSubjectStart();
-		subject = resultVector[i].getSubject();
-		subjectEnd = resultVector[i].getSubjectEnd();
+	for (int i = 0; i < blaPDBResultVector.size(); i++) {
+		proteinName = blaPDBResultVector[i].getProteinName();
+		queryStart = blaPDBResultVector[i].getQueryStart();
+		query = blaPDBResultVector[i].getQuery();
+		queryEnd = blaPDBResultVector[i].getQueryEnd();
+		subjectStart = blaPDBResultVector[i].getSubjectStart();
+		subject = blaPDBResultVector[i].getSubject();
+		subjectEnd = blaPDBResultVector[i].getSubjectEnd();
 		int headMore = queryStart - 1;
 		int tailMore = proteinSeqLength - queryEnd;
-		vector<float> Xs = resultVector[i].getXCoords();
-		vector<float> Ys = resultVector[i].getYCoords();
-		vector<float> Zs = resultVector[i].getZCoords();
+		vector<float> Xs = blaPDBResultVector[i].getXCoords();
+		vector<float> Ys = blaPDBResultVector[i].getYCoords();
+		vector<float> Zs = blaPDBResultVector[i].getZCoords();
 		string protein3DCorrdsFilename(outputFileLocation);
 		protein3DCorrdsFilename += "/";
 		protein3DCorrdsFilename += rootName;
