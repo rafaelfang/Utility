@@ -1,12 +1,18 @@
-convert: jsoncpp.o AlignmentResult.o BLANRImpl.o BLANRResult.o BLAPDBImpl.o BLAPDBResult.o Driver.o UtilityInterface.o 
-	g++ jsoncpp.o AlignmentResult.o BLANRImpl.o BLANRResult.o BLAPDBImpl.o BLAPDBResult.o Driver.o UtilityInterface.o  -o convert
+convert: jsoncpp.o AlignmentResult.o HHRImpl.o HHRResult.o BLANRImpl.o BLANRResult.o BLAPDBImpl.o BLAPDBResult.o Driver.o UtilityInterface.o 
+	g++ jsoncpp.o AlignmentResult.o HHRImpl.o HHRResult.o BLANRImpl.o BLANRResult.o BLAPDBImpl.o BLAPDBResult.o Driver.o UtilityInterface.o  -o convert
 
 jsoncpp.o: jsoncpp.cpp
 	g++ -c jsoncpp.cpp
 	
 AlignmentResult.o: AlignmentResult.cpp
 	g++ -c AlignmentResult.cpp
-
+	
+HHRImpl.o: HHRImpl.cpp
+	g++ -c HHRImpl.cpp
+	
+HHRResult.o: HHRResult.cpp
+	g++ -c HHRResult.cpp
+	
 BLAPDBImpl.o: BLAPDBImpl.cpp
 	g++ -c BLAPDBImpl.cpp
 	
