@@ -12,6 +12,7 @@
 #include "BLANRImpl.h"
 #include "BLAPDBImpl.h"
 #include "HHRImpl.h"
+#include "HHRNRImpl.h"
 
 using namespace std;
 
@@ -54,5 +55,17 @@ int main(int argc, char* argv[]) {
 		hhrImpl.findLocalAlign();
 		hhrImpl.findGlobalAlign();
 	}
+
+	// -hhrNR T0837
+	if (strcmp(argv[1], "-hhrNR") == 0) {
+		HHRNRImpl hhrNRImpl(argv[2]);
+		hhrNRImpl.populateResultVector();
+		hhrNRImpl.makeDirectory();
+		hhrNRImpl.write2Json();
+		//hhrNRImpl.setup3DCoords();
+		//hhrNRImpl.findLocalAlign();
+		//hhrNRImpl.findGlobalAlign();
+	}
+
 	return 0;
 }
