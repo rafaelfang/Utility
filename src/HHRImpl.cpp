@@ -362,8 +362,8 @@ void HHRImpl::findGlobalAlign() {
 		targetStart = hhrResultVector[i].getTargetStart();
 		target = hhrResultVector[i].getTarget();
 		targetEnd = hhrResultVector[i].getTargetEnd();
-		int headMore = targetStart - 1;
-		int tailMore = proteinSeqLength - targetEnd;
+		int headMore = queryStart - 1;
+		int tailMore = proteinSeqLength - queryEnd;
 		vector<float> Xs = hhrResultVector[i].getXCoords();
 		vector<float> Ys = hhrResultVector[i].getYCoords();
 		vector<float> Zs = hhrResultVector[i].getZCoords();
@@ -398,7 +398,7 @@ void HHRImpl::findGlobalAlign() {
 
 		}
 		if (tailMore > 0) {
-			for (int k = 1; k < tailMore; k++) {
+			for (int k = 1; k <= tailMore; k++) {
 				outJsonFile << "\"" << "t" << "\":\"" << Xs[targetEnd + k]
 						<< "," << Ys[targetEnd + k] << "," << Zs[targetEnd + k]
 						<< "\"\n";

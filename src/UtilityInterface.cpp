@@ -55,7 +55,7 @@ void UtilityInterface::findProteinSeqLength() {
 	inFilename += "/";
 	inFilename += rootName;
 	inFilename += ".fasta";
-	cout<<inFilename<<endl;
+	//cout<<inFilename<<endl;
 
 	FILE* fptr = fopen((char*) inFilename.c_str(), "r");
 	if (fptr == NULL) {
