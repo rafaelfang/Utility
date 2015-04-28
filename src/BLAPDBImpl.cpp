@@ -269,31 +269,34 @@ void BLAPDBImpl::write2Json() {
 	for (int i = 0; i < blaPDBResultVector.size(); i++) {
 
 		outputFile << "\"protein" << i << "\":{\n";
-		outputFile << "\t\"proteinName\":\"" << blaPDBResultVector[i].getProteinName()
-				<< "\",\n";
+		outputFile << "\t\"proteinName\":\""
+				<< blaPDBResultVector[i].getProteinName() << "\",\n";
 		outputFile << "\t\"Length\":\"" << blaPDBResultVector[i].getLength()
 				<< "\",\n";
-		outputFile << "\t\"Score\":\"" << blaPDBResultVector[i].getScore() << "\",\n";
+		outputFile << "\t\"Score\":\"" << blaPDBResultVector[i].getScore()
+				<< "\",\n";
 		outputFile << "\t\"Expect\":\"" << blaPDBResultVector[i].getExpect()
 				<< "\",\n";
-		outputFile << "\t\"Identities\":\"" << blaPDBResultVector[i].getIdentities()
+		outputFile << "\t\"Identities\":\""
+				<< blaPDBResultVector[i].getIdentities() << "\",\n";
+		outputFile << "\t\"Positives\":\""
+				<< blaPDBResultVector[i].getPositives() << "\",\n";
+		outputFile << "\t\"Gaps\":\"" << blaPDBResultVector[i].getGaps()
 				<< "\",\n";
-		outputFile << "\t\"Positives\":\"" << blaPDBResultVector[i].getPositives()
+		outputFile << "\t\"QueyStart\":\""
+				<< blaPDBResultVector[i].getQueryStart() << "\",\n";
+		outputFile << "\t\"Query\":\"" << blaPDBResultVector[i].getQuery()
 				<< "\",\n";
-		outputFile << "\t\"Gaps\":\"" << blaPDBResultVector[i].getGaps() << "\",\n";
-		outputFile << "\t\"QueyStart\":\"" << blaPDBResultVector[i].getQueryStart()
-				<< "\",\n";
-		outputFile << "\t\"Query\":\"" << blaPDBResultVector[i].getQuery() << "\",\n";
 		outputFile << "\t\"QueryEnd\":\"" << blaPDBResultVector[i].getQueryEnd()
 				<< "\",\n";
-		outputFile << "\t\"Alignment\":\"" << blaPDBResultVector[i].getAlignment()
-				<< "\",\n";
+		outputFile << "\t\"Alignment\":\""
+				<< blaPDBResultVector[i].getAlignment() << "\",\n";
 		outputFile << "\t\"SubjectStart\":\""
 				<< blaPDBResultVector[i].getSubjectStart() << "\",\n";
 		outputFile << "\t\"Subject\":\"" << blaPDBResultVector[i].getSubject()
 				<< "\",\n";
-		outputFile << "\t\"SubjectEnd\":\"" << blaPDBResultVector[i].getSubjectEnd()
-				<< "\"\n";
+		outputFile << "\t\"SubjectEnd\":\""
+				<< blaPDBResultVector[i].getSubjectEnd() << "\"\n";
 		outputFile << "},\n";
 	}
 	outputFile << "\"finish\":\"end\"" << "\n";
@@ -449,12 +452,14 @@ void BLAPDBImpl::findGlobalAlign() {
 			}
 
 		}
+		//cout<<"Tailmore"<<tailMore<<endl;;
 		if (tailMore > 0) {
-			for (int k = 1; k < tailMore; k++) {
+			for (int k = 1; k <= tailMore; k++) {
 				outJsonFile << "\"" << "t" << "\":\"" << Xs[subjectEnd + k]
 						<< "," << Ys[subjectEnd + k] << ","
 						<< Zs[subjectEnd + k] << "\"\n";
 			}
+
 		}
 		outJsonFile << "}\n";
 		outJsonFile.close();
