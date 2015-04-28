@@ -8,6 +8,7 @@
 #include "UtilityInterface.h"
 
 #include <stdio.h>
+#include <cstring>
 #include <fstream>
 #include <iostream>
 
@@ -16,6 +17,7 @@
 UtilityInterface::UtilityInterface(char* rootName) {
 	setRootName(rootName);
 	loadConfigurationFile();
+	findProteinSeqLength();
 
 }
 void UtilityInterface::loadConfigurationFile() {
@@ -62,8 +64,10 @@ void UtilityInterface::findProteinSeqLength() {
 	char line[500];
 	fgets(line, 500, fptr);
 	fgets(line, 500, fptr);
-	string proteinSeq(line);
-	proteinSeqLength= proteinSeq.size();
+
+	proteinSeqLength= strlen(line)-1;//should not count the "\0"
+	//cout<<"proteinSeqLength"<<proteinSeqLength<<endl;
+	fclose(fptr);
 }
 
 
