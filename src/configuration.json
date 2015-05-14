@@ -1,6 +1,6 @@
 {
 	"DBInfoLocation":"/home/lihongb/DATABASE/DBInfo/",
-	"inputFileLocation":"/home/cf797/test/queryFolder/",
+	"inputFileLocation":"/home/cf797/test/testAlignment/",
 	"outputFileLocation":"/home/cf797/test/outputResultFolder/",
 	"proteinLocation": "/home/cf797/test/Proteins/"
   
