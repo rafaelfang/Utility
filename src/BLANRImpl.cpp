@@ -22,8 +22,7 @@ void BLANRImpl::makeDirectory() {
 	string outputFileFoldername(outputFileLocation);
 	outputFileFoldername += "/";
 	outputFileFoldername += rootName;
-	outputFileFoldername += "/";
-	//cout << outputFileFoldername << endl;
+	outputFileFoldername += "/BLANR/";
 	sprintf(cmd1, "mkdir -p %s", (char*) outputFileFoldername.c_str());
 	//cout << cmd1 << endl;
 	system(cmd1);
@@ -38,7 +37,7 @@ void BLANRImpl::populateResultVector() {
 	inFilename += rootName;
 	inFilename += "/";
 	inFilename += "/query.blaNR";
-
+	//cout<<inFilename<<endl;
 	FILE* fptr = fopen((char*) inFilename.c_str(), "r");
 	if (fptr == NULL) {
 		cout << "input file: " << inFilename << " can't open" << endl;
@@ -219,7 +218,7 @@ void BLANRImpl::write2Json() {
 
 	string outFilename(outputFileLocation);
 	outFilename += rootName;
-	outFilename += "/";
+	outFilename += "/BLANR/";
 	outFilename += "blaNR.json";
 	//cout<<outFilename<<endl;
 	ofstream outputFile(outFilename.c_str());
