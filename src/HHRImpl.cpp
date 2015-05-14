@@ -24,27 +24,27 @@ void HHRImpl::makeDirectory() {
 	string outputFileFoldername(outputFileLocation);
 	outputFileFoldername += "/";
 	outputFileFoldername += rootName;
-	outputFileFoldername += "/";
+	outputFileFoldername += "/HHR/";
 	sprintf(cmd1, "mkdir -p %s", (char*) outputFileFoldername.c_str());
-	//cout << cmd << endl;
+	cout << cmd1 << endl;
 	system(cmd1);
 
 	char cmd2[500];
 	string outputFileLocal3DFoldername(outputFileLocation);
 	outputFileLocal3DFoldername += "/";
 	outputFileLocal3DFoldername += rootName;
-	outputFileLocal3DFoldername += "/local/";
+	outputFileLocal3DFoldername += "/HHR/local/";
 	sprintf(cmd2, "mkdir -p %s", (char*) outputFileLocal3DFoldername.c_str());
-	//cout << cmd << endl;
+	cout << cmd2 << endl;
 	system(cmd2);
 
 	char cmd3[500];
 	string outputFileGlobal3DFoldername(outputFileLocation);
 	outputFileGlobal3DFoldername += "/";
 	outputFileGlobal3DFoldername += rootName;
-	outputFileGlobal3DFoldername += "/Global/";
+	outputFileGlobal3DFoldername += "/HHR/FullyExtended/";
 	sprintf(cmd3, "mkdir -p %s", (char*) outputFileGlobal3DFoldername.c_str());
-	//cout << cmd << endl;
+	cout << cmd3 << endl;
 	system(cmd3);
 }
 void HHRImpl::populateResultVector() {
@@ -55,7 +55,7 @@ void HHRImpl::populateResultVector() {
 	inFilename += rootName;
 	inFilename += "/";
 	inFilename += "/query.hhr";
-
+	cout<<inFilename<<endl;
 	FILE* inputFile = fopen((char*) inFilename.c_str(), "r");
 	if (inputFile == NULL) {
 		cout << "input file: " << inFilename << " can't open" << endl;
@@ -195,7 +195,7 @@ void HHRImpl::write2Json() {
 
 	string outFilename(outputFileLocation);
 	outFilename += rootName;
-	outFilename += "/";
+	outFilename += "/HHR/";
 	outFilename += "hhr.json";
 	cout << outFilename << endl;
 	ofstream outputFile(outFilename.c_str());
@@ -320,7 +320,7 @@ void HHRImpl::findLocalAlign() {
 		string protein3DCorrdsFilename(outputFileLocation);
 		protein3DCorrdsFilename += "/";
 		protein3DCorrdsFilename += rootName;
-		protein3DCorrdsFilename += "/local/";
+		protein3DCorrdsFilename += "/HHR/local/";
 		protein3DCorrdsFilename += proteinName;
 		protein3DCorrdsFilename += "_";
 		protein3DCorrdsFilename += target;
@@ -370,7 +370,7 @@ void HHRImpl::findGlobalAlign() {
 		string protein3DCorrdsFilename(outputFileLocation);
 		protein3DCorrdsFilename += "/";
 		protein3DCorrdsFilename += rootName;
-		protein3DCorrdsFilename += "/Global/";
+		protein3DCorrdsFilename += "/HHR/FullyExtended/";
 		protein3DCorrdsFilename += proteinName;
 		protein3DCorrdsFilename += "_";
 		protein3DCorrdsFilename += target;
