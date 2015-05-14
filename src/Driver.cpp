@@ -48,7 +48,9 @@ int main(int argc, char* argv[]) {
 	// -hhr T0837
 	if (strcmp(argv[1], "-hhr") == 0) {
 		HHRImpl hhrImpl(argv[2]);
+		cout<<"hereasfda"<<endl;
 		hhrImpl.populateResultVector();
+		cout<<"here"<<endl;
 		hhrImpl.makeDirectory();
 		hhrImpl.write2Json();
 		hhrImpl.setup3DCoords();
