@@ -25,7 +25,7 @@ void HHRNRImpl::makeDirectory() {
 	string outputFileFoldername(outputFileLocation);
 	outputFileFoldername += "/";
 	outputFileFoldername += rootName;
-	outputFileFoldername += "/";
+	outputFileFoldername += "/HHRNR/";
 	sprintf(cmd1, "mkdir -p %s", (char*) outputFileFoldername.c_str());
 	//cout << cmd << endl;
 	system(cmd1);
@@ -180,7 +180,7 @@ void HHRNRImpl::write2Json() {
 
 	string outFilename(outputFileLocation);
 	outFilename += rootName;
-	outFilename += "/";
+	outFilename += "/HHRNR/";
 	outFilename += "hhrNR.json";
 
 	ofstream outputFile(outFilename.c_str());
