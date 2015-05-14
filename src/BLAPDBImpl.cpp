@@ -24,7 +24,7 @@ void BLAPDBImpl::makeDirectory() {
 	string outputFileFoldername(outputFileLocation);
 	outputFileFoldername += "/";
 	outputFileFoldername += rootName;
-	outputFileFoldername += "/";
+	outputFileFoldername += "/BLAPDB/";
 	sprintf(cmd1, "mkdir -p %s", (char*) outputFileFoldername.c_str());
 	//cout << cmd << endl;
 	system(cmd1);
@@ -33,7 +33,7 @@ void BLAPDBImpl::makeDirectory() {
 	string outputFileLocal3DFoldername(outputFileLocation);
 	outputFileLocal3DFoldername += "/";
 	outputFileLocal3DFoldername += rootName;
-	outputFileLocal3DFoldername += "/local/";
+	outputFileLocal3DFoldername += "/BLAPDB/local/";
 	sprintf(cmd2, "mkdir -p %s", (char*) outputFileLocal3DFoldername.c_str());
 	//cout << cmd << endl;
 	system(cmd2);
@@ -42,7 +42,7 @@ void BLAPDBImpl::makeDirectory() {
 	string outputFileGlobal3DFoldername(outputFileLocation);
 	outputFileGlobal3DFoldername += "/";
 	outputFileGlobal3DFoldername += rootName;
-	outputFileGlobal3DFoldername += "/Global/";
+	outputFileGlobal3DFoldername += "/BLAPDB/FullyExtended/";
 	sprintf(cmd3, "mkdir -p %s", (char*) outputFileGlobal3DFoldername.c_str());
 	//cout << cmd << endl;
 	system(cmd3);
@@ -259,7 +259,7 @@ void BLAPDBImpl::write2Json() {
 
 	string outFilename(outputFileLocation);
 	outFilename += rootName;
-	outFilename += "/";
+	outFilename += "/BLAPDB/";
 	outFilename += "blaPDB.json";
 	//cout<<outFilename<<endl;
 	ofstream outputFile(outFilename.c_str());
@@ -375,7 +375,7 @@ void BLAPDBImpl::findLocalAlign() {
 		string protein3DCorrdsFilename(outputFileLocation);
 		protein3DCorrdsFilename += "/";
 		protein3DCorrdsFilename += rootName;
-		protein3DCorrdsFilename += "/local/";
+		protein3DCorrdsFilename += "/BLAPDB/local/";
 		protein3DCorrdsFilename += proteinName;
 		protein3DCorrdsFilename += "_";
 		protein3DCorrdsFilename += subject;
@@ -425,7 +425,7 @@ void BLAPDBImpl::findGlobalAlign() {
 		string protein3DCorrdsFilename(outputFileLocation);
 		protein3DCorrdsFilename += "/";
 		protein3DCorrdsFilename += rootName;
-		protein3DCorrdsFilename += "/Global/";
+		protein3DCorrdsFilename += "/BLAPDB/FullyExtended/";
 		protein3DCorrdsFilename += proteinName;
 		protein3DCorrdsFilename += "_";
 		protein3DCorrdsFilename += subject;
