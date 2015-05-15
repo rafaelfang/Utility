@@ -11,6 +11,23 @@ HHRResult::HHRResult() {
 	// TODO Auto-generated constructor stub
 
 }
+
+bool HHRResult::isFirstStateReached() {
+	return firstStateReached;
+}
+
+void HHRResult::setFirstStateReached(bool firstStateReached = false) {
+	this->firstStateReached = firstStateReached;
+}
+
+bool HHRResult::isSecondStateReached() {
+	return secondStateReached;
+}
+
+void HHRResult::setSecondStateReached(bool secondStateReached = false) {
+	this->secondStateReached = secondStateReached;
+}
+
 int HHRResult::getAlignedCols() {
 	return aligned_cols;
 }
