@@ -26,7 +26,7 @@ void HHRImpl::makeDirectory() {
 	outputFileFoldername += rootName;
 	outputFileFoldername += "/HHR/";
 	sprintf(cmd1, "mkdir -p %s", (char*) outputFileFoldername.c_str());
-	cout << cmd1 << endl;
+	//cout << cmd1 << endl;
 	system(cmd1);
 
 	char cmd2[500];
@@ -35,7 +35,7 @@ void HHRImpl::makeDirectory() {
 	outputFileLocal3DFoldername += rootName;
 	outputFileLocal3DFoldername += "/HHR/local/";
 	sprintf(cmd2, "mkdir -p %s", (char*) outputFileLocal3DFoldername.c_str());
-	cout << cmd2 << endl;
+	//cout << cmd2 << endl;
 	system(cmd2);
 
 	char cmd3[500];
@@ -44,7 +44,7 @@ void HHRImpl::makeDirectory() {
 	outputFileGlobal3DFoldername += rootName;
 	outputFileGlobal3DFoldername += "/HHR/FullyExtended/";
 	sprintf(cmd3, "mkdir -p %s", (char*) outputFileGlobal3DFoldername.c_str());
-	cout << cmd3 << endl;
+	//cout << cmd3 << endl;
 	system(cmd3);
 }
 void HHRImpl::populateResultVector() {
@@ -55,7 +55,7 @@ void HHRImpl::populateResultVector() {
 	inFilename += rootName;
 	inFilename += "/";
 	inFilename += "/query.hhr";
-	cout<<inFilename<<endl;
+	cout << inFilename << endl;
 	FILE* inputFile = fopen((char*) inFilename.c_str(), "r");
 	if (inputFile == NULL) {
 		cout << "input file: " << inFilename << " can't open" << endl;
@@ -63,10 +63,10 @@ void HHRImpl::populateResultVector() {
 
 	HHRResult result;
 
-	while (fgets(line, 200, inputFile) != NULL) {
+	while (fgets(line, 500, inputFile) != NULL) {
 
-		if (strstr(line, ">") != NULL) {
-			counter++;
+		if (strstr(line, ">") != NULL && !result.isFirstStateReached()) {
+			//set first block information
 			char proteinName[7];
 			char* pos1 = strstr(line, ">");
 			sscanf(pos1 + 1, "%s", proteinName);
@@ -104,26 +104,15 @@ void HHRImpl::populateResultVector() {
 			sscanf(pos5 + 1, "%f", &identities);
 			result.setIdentities(identities);
 
-			char* pos6 = strstr(pos5 + 1, "=");
-			float similarity;
-			sscanf(pos6 + 1, "%f", &similarity);
-			result.setSimilarities(similarity);
+			result.setFirstStateReached(true);
+		}
 
-			char* pos7 = strstr(pos6 + 1, "=");
-			float sumProbs;
-			sscanf(pos7 + 1, "%f", &sumProbs);
-			result.setSumProbs(sumProbs);
-
-			fgets(line, 200, inputFile); //blank
+		if ((strstr(line, "Q ref|") != NULL)
+				&& !result.isSecondStateReached()) {
+			//set second block information
 
 			//get the query
-			fgets(line, 200, inputFile);
-			char query_ss_pred[100];
-			sscanf(line + 17, "%s", query_ss_pred);
-			string strQuery_ss_pred(query_ss_pred);
-			result.setQuerySsPred(strQuery_ss_pred);
 
-			fgets(line, 200, inputFile);
 			int queryStart;
 			char query[100];
 			int queryEnd;
@@ -178,16 +167,145 @@ void HHRImpl::populateResultVector() {
 			string strTPred(tPred);
 			result.setTargetSsPred(strTPred);
 
-			counter++;
-			string searchDBFilename(DBInfoLocation);
-			searchDBFilename += proteinName;
-			searchDBFilename += ".db";
-			//cout<<searchDBFilename<<endl;
+			//get the TConf
+			fgets(line, 200, inputFile);
+			char tConf[100];
+			sscanf(line + 17, "%s", tConf);
+			string strTConf(tConf);
+			result.setConfidence(strTConf);
 
+			result.setSecondStateReached(true);
+		}
+
+		if ((strstr(line, "Q ref|") != NULL) && result.isSecondStateReached()) {
+			//update second block information, so in this case
+			//quert, alignment and target should be long string
+			//the queryEnd and targetEnd should also be updated
+			//get the query
+
+			int queryStart;
+			char query[100];
+			int queryEnd;
+			sscanf(line + 17, "%d %s %d", &queryStart, query, &queryEnd);
+
+			string additionalQuery(query);
+			string newQuery = result.getQuery();
+			newQuery += additionalQuery;
+			result.setQuery(newQuery);
+			result.setQueryEnd(queryEnd);
+
+			//get the Q Consensus
+			fgets(line, 200, inputFile);
+			int QConsensusStart;
+			char QConsensus[100];
+			int QConsensusEnd;
+			sscanf(line + 17, "%d %s %d", &QConsensusStart, QConsensus,
+					&QConsensusEnd);
+			string additionalQConsensus(QConsensus);
+			string newQConsesus = result.getQueryConsensus();
+			newQConsesus += additionalQConsensus;
+			result.setQueryConsensus(newQConsesus);
+
+			//get alignment
+			fgets(line, 200, inputFile);
+			char alignment[100];
+			sscanf(line + 17, "%s", alignment);
+			string additionalAlignment(alignment);
+			string newAlignment = result.getAlignment();
+			newAlignment += additionalAlignment;
+			result.setAlignment(newAlignment);
+
+			//get the T Consensus
+			fgets(line, 200, inputFile);
+			int targetStart;
+			char targetConsensus[100];
+			int targetEnd;
+			sscanf(line + 17, "%d %s %d", &targetStart, targetConsensus,
+					&targetEnd);
+
+			string additionalTargetConsensus(targetConsensus);
+			string newTargetConsensus = result.getTargetConsensus();
+			newTargetConsensus += additionalTargetConsensus;
+			result.setTargetConsensus(newTargetConsensus);
+			result.setTargetEnd(targetEnd);
+
+			//get the Target
+			fgets(line, 200, inputFile);
+
+			char target[100];
+
+			sscanf(line + 17, "%d %s %d", &targetStart, target, &targetEnd);
+			string additionalTarget(target);
+			string newTarget = result.getTarget();
+			newTarget += additionalTarget;
+			result.setTarget(newTarget);
+
+			//get the TPred
+			fgets(line, 200, inputFile);
+			char tPred[100];
+			sscanf(line + 17, "%s", tPred);
+			string additionalTPred(tPred);
+			string newTPred = result.getTargetSsPred();
+			newTPred += additionalTPred;
+			result.setTargetSsPred(newTPred);
+
+			//get the TConf
+			fgets(line, 200, inputFile);
+			char tConf[100];
+			sscanf(line + 17, "%s", tConf);
+			string additionalTConf(tConf);
+			string newTConf = result.getConfidence();
+			newTConf += additionalTConf;
+			result.setConfidence(newTConf);
+		}
+
+		if ((strstr(line, ">") != NULL) && result.isFirstStateReached()) {
+			//first push the result to the vector
 			hhrResultVector.push_back(result);
+			//then update the information set the first state flag
+			//set first block information
+			char proteinName[7];
+			char* pos1 = strstr(line, ">");
+			sscanf(pos1 + 1, "%s", proteinName);
+			string proteinNameStr(proteinName);
+			result.setProteinName(proteinNameStr);
+
+			while (strstr(line, "Probab=") == NULL) {
+				fgets(line, 500, inputFile); //skip long name
+			}
+
+			//get probab, E-value, Score, Aligned_cols, Identities, Similarity, Sum_probs
+
+			pos1 = strstr(line, "=");
+			float probab;
+			sscanf(pos1 + 1, "%f", &probab);
+			result.setProbab(probab);
+
+			char* pos2 = strstr(pos1 + 1, "=");
+			float eValue;
+			sscanf(pos2 + 1, "%f", &eValue);
+			result.setExpect(eValue);
+
+			char* pos3 = strstr(pos2 + 1, "=");
+			float score;
+			sscanf(pos3 + 1, "%f", &score);
+			result.setScore(score);
+
+			char* pos4 = strstr(pos3 + 1, "=");
+			int alignedCols;
+			sscanf(pos4 + 1, "%d", &alignedCols);
+			result.setAlignedCols(alignedCols);
+
+			char* pos5 = strstr(pos4 + 1, "=");
+			float identities;
+			sscanf(pos5 + 1, "%f", &identities);
+			result.setIdentities(identities);
+
+			result.setFirstStateReached(true);
+			result.setSecondStateReached(false);
 		}
 	}
-
+	hhrResultVector.push_back(result);
 	fclose(inputFile);
 }
 
@@ -215,12 +333,7 @@ void HHRImpl::write2Json() {
 				<< hhrResultVector[i].getAlignedCols() << "\",\n";
 		outputFile << "\t\"identities\":\""
 				<< hhrResultVector[i].getIdentities() << "\",\n";
-		outputFile << "\t\"similarity\":\""
-				<< hhrResultVector[i].getSimilarities() << "\",\n";
-		outputFile << "\t\"sumProbs\":\"" << hhrResultVector[i].getSumProbs()
-				<< "\",\n";
-		outputFile << "\t\"QuerySSPred\":\""
-				<< hhrResultVector[i].getQuerySsPred() << "\",\n";
+
 		outputFile << "\t\"QueryStart\":\""
 				<< hhrResultVector[i].getQueryStart() << "\",\n";
 		outputFile << "\t\"Query\":\"" << hhrResultVector[i].getQuery()
@@ -239,6 +352,8 @@ void HHRImpl::write2Json() {
 				<< "\",\n";
 		outputFile << "\t\"target\":\"" << hhrResultVector[i].getTarget()
 				<< "\",\n";
+		outputFile << "\t\"targetConf\":\""
+				<< hhrResultVector[i].getConfidence() << "\",\n";
 		outputFile << "\t\"tPred\":\"" << hhrResultVector[i].getTargetSsPred()
 				<< "\"\n";
 		outputFile << "},\n";
