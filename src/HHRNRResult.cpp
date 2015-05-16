@@ -15,6 +15,23 @@ HHRNRResult::HHRNRResult() {
 HHRNRResult::~HHRNRResult() {
 	// TODO Auto-generated destructor stub
 }
+
+bool HHRNRResult::isFirstStateReached() {
+	return firstStateReached;
+}
+
+void HHRNRResult::setFirstStateReached(bool firstStateReached = false) {
+	this->firstStateReached = firstStateReached;
+}
+
+bool HHRNRResult::isSecondStateReached() {
+	return secondStateReached;
+}
+
+void HHRNRResult::setSecondStateReached(bool secondStateReached = false) {
+	this->secondStateReached = secondStateReached;
+}
+
 int HHRNRResult::getAlignedCols() {
 	return aligned_cols;
 }
