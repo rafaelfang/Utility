@@ -55,7 +55,7 @@ void HHRImpl::populateResultVector() {
 	inFilename += rootName;
 	inFilename += "/";
 	inFilename += "/query.hhr";
-	cout << inFilename << endl;
+	//cout << inFilename << endl;
 	FILE* inputFile = fopen((char*) inFilename.c_str(), "r");
 	if (inputFile == NULL) {
 		cout << "input file: " << inFilename << " can't open" << endl;
@@ -315,7 +315,7 @@ void HHRImpl::write2Json() {
 	outFilename += rootName;
 	outFilename += "/HHR/";
 	outFilename += "hhr.json";
-	cout << outFilename << endl;
+	//cout << outFilename << endl;
 	ofstream outputFile(outFilename.c_str());
 
 	outputFile << "{" << "\n";
