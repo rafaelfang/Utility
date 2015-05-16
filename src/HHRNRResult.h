@@ -59,8 +59,14 @@ public:
 	void setTargetStart(int targetStart);
 	string& getQuerySsPred();
 	void setQuerySsPred(string& querySsPred);
+	bool isFirstStateReached();
+	void setFirstStateReached(bool);
+	bool isSecondStateReached();
+	void setSecondStateReached(bool);
 
 private:
+	bool firstStateReached;
+	bool secondStateReached;
 
 	string proteinName;
 	float probab;
