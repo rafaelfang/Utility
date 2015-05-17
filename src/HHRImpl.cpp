@@ -444,8 +444,8 @@ void HHRImpl::findLocalAlign() {
 		outJsonFile << "{\n";
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
 		for (int j = 1; j <= target.size(); j++) {
-			if (target[j] == '-') {
-				outJsonFile << "\"" << target[j] << "\":\""
+			if (target[j-1] == '-') {
+				outJsonFile << "\"" << target[j-1] << "\":\""
 						<< "10000,10000,10000\"\n";
 			} else {
 
@@ -477,11 +477,26 @@ void HHRImpl::findGlobalAlign() {
 		targetStart = hhrResultVector[i].getTargetStart();
 		target = hhrResultVector[i].getTarget();
 		targetEnd = hhrResultVector[i].getTargetEnd();
-		int headMore = queryStart - 1;
-		int tailMore = proteinSeqLength - queryEnd;
+		int queryHeadMore = queryStart - 1;
+		int queryTailMore = proteinSeqLength - queryEnd;
 		vector<float> Xs = hhrResultVector[i].getXCoords();
 		vector<float> Ys = hhrResultVector[i].getYCoords();
 		vector<float> Zs = hhrResultVector[i].getZCoords();
+		int targetHeadMore=targetStart-1;
+		int targetTailMore=Xs.size()-targetEnd;
+		int headMore=0;
+		if(queryHeadMore>targetHeadMore){
+			headMore=targetHeadMore;
+		}else{
+			headMore=queryHeadMore;
+		}
+
+		int tailMore=0;
+		if(queryTailMore>targetTailMore){
+			tailMore=targetTailMore;
+		}else{
+			tailMore=queryTailMore;
+		}
 		string protein3DCorrdsFilename(outputFileLocation);
 		protein3DCorrdsFilename += "/";
 		protein3DCorrdsFilename += rootName;
@@ -500,8 +515,8 @@ void HHRImpl::findGlobalAlign() {
 			headMore--;
 		}
 		for (int j = 1; j <= target.size(); j++) {
-			if (target[j] == '-') {
-				outJsonFile << "\"" << target[j] << "\":\""
+			if (target[j-1] == '-') {
+				outJsonFile << "\"" << target[j-1] << "\":\""
 						<< "10000,10000,10000\"\n";
 			} else {
 
