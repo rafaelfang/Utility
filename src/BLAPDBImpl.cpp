@@ -385,7 +385,7 @@ void BLAPDBImpl::findLocalAlign() {
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
 		for (int j = 1; j <= subject.size(); j++) {
 			if (subject[j] == '-') {
-				outJsonFile << "\"" << subject[j] << "\":\""
+				outJsonFile << "\"" << subject[j - 1] << "\":\""
 						<< "10000,10000,10000\"\n";
 			} else {
 
@@ -417,11 +417,27 @@ void BLAPDBImpl::findGlobalAlign() {
 		subjectStart = blaPDBResultVector[i].getSubjectStart();
 		subject = blaPDBResultVector[i].getSubject();
 		subjectEnd = blaPDBResultVector[i].getSubjectEnd();
-		int headMore = queryStart - 1;
-		int tailMore = proteinSeqLength - queryEnd;
+		int queryHeadMore = queryStart - 1;
+		int queryTailMore = proteinSeqLength - queryEnd;
 		vector<float> Xs = blaPDBResultVector[i].getXCoords();
 		vector<float> Ys = blaPDBResultVector[i].getYCoords();
 		vector<float> Zs = blaPDBResultVector[i].getZCoords();
+		int subjectHeadMore = subjectStart - 1;
+		int subjectTailMore = Xs.size() - subjectEnd;
+		int headMore = 0;
+
+		if (queryHeadMore > subjectHeadMore) {
+			headMore = subjectHeadMore;
+		} else {
+			headMore = queryHeadMore;
+		}
+
+		int tailMore = 0;
+		if (queryTailMore > subjectTailMore) {
+			tailMore = subjectTailMore;
+		} else {
+			tailMore = queryTailMore;
+		}
 		string protein3DCorrdsFilename(outputFileLocation);
 		protein3DCorrdsFilename += "/";
 		protein3DCorrdsFilename += rootName;
