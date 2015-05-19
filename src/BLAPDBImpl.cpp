@@ -316,15 +316,15 @@ void BLAPDBImpl::setup3DCoords() {
 		if (fptr == NULL) {
 			cout << proteinDBFilename << " can't open!" << endl;
 		}
-		char line[500];
-		char proteinSeq[500];
+		char line[3000];
+		char proteinSeq[3000];
 		int seqLength;
 		vector<float> Xs;
 		vector<float> Ys;
 		vector<float> Zs;
-		while (fgets(line, 500, fptr) != NULL) {
+		while (fgets(line, 3000, fptr) != NULL) {
 			if (strstr(line, ">Reference Sequence Info:") != NULL) {
-				fgets(line, 500, fptr);
+				fgets(line, 3000, fptr);
 				sscanf(line, "%s", proteinSeq);
 				string s(proteinSeq);
 				seqLength = s.size();
