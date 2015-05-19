@@ -17,11 +17,15 @@ foreach $line(@lines) {
 	$cmd2 = "./convert -blaNR $line";
 	$cmd3 = "./convert -hhr $line";
 	$cmd4 = "./convert -hhrNR $line";
-	print $cmd."\n";
+
 	$start_run = time();
+	print $cmd1."\n";
 	system($cmd1);
+	print $cmd2."\n";
 	system($cmd2);
+	print $cmd3."\n";
 	system($cmd3);
+	print $cmd4."\n";
 	system($cmd4);
 	$end_run = time();
 	$run_time = $end_run - $start_run;
