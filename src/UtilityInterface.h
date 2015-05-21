@@ -20,11 +20,13 @@ public:
 	virtual void write2Json()=0;
 	virtual void setup3DCoords()=0;
 	virtual void findLocalAlign()=0;
+	virtual void write2PDB()=0;
 	virtual void findGlobalAlign()=0;
 	virtual ~UtilityInterface();
 	char* getRootName();
 	void setRootName(char* rootName);
 	void findProteinSeqLength();
+	string convertResidueName(const char residueName);
 
 
 protected:
