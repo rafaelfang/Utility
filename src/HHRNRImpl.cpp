@@ -366,6 +366,10 @@ void HHRNRImpl::setup3DCoords() {
 void HHRNRImpl::findLocalAlign() {
 
 }
+
+void HHRNRImpl::write2PDB() {
+
+}
 void HHRNRImpl::findGlobalAlign() {
 
 }
