@@ -271,6 +271,9 @@ void BLANRImpl::setup3DCoords() {
 void BLANRImpl::findLocalAlign() {
 
 }
+void BLANRImpl::write2PDB() {
+
+}
 void BLANRImpl::findGlobalAlign() {
 
 }
