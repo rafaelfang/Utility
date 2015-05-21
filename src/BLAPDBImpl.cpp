@@ -447,17 +447,16 @@ void BLAPDBImpl::write2PDB() {
 				//	<< "10000,10000,10000\"\n";
 			} else {
 
-				pdbFile << "ATOM" << setw(6) //record name
-						<< subjectStart + j - 1<< setw(5) // atom serial number
-						<< "CA"<< setw(4) //atom name
-						<< setw(1) //alternate location indicator
-						<< convertResidueName(query.at(j - 1))
-						<< setw(3) //residue name
-						<< subjectStart + j - 1
-						<< setw(5) // atom serial number
-						<< Xs[subjectStart + j - 1] << setw(8)
-						<< Ys[subjectStart + j - 1] << setw(8)
-						<< Zs[subjectStart + j - 1] << setw(8) << "1.00 0.00\n";
+				pdbFile << "ATOM  ";				//record name
+				pdbFile << right << setw(5) << subjectStart + j - 1; // atom serial number
+				pdbFile << "  CA  "; //atom name
+				pdbFile << convertResidueName(query.at(j - 1));
+				pdbFile << right << subjectStart + j - 1 << setw(6); // atom serial number
+				pdbFile << "    ";
+				pdbFile << Xs[subjectStart + j - 1] << setw(8.3);
+				pdbFile << Ys[subjectStart + j - 1] << setw(8.3);
+				pdbFile << Zs[subjectStart + j - 1] << setw(8.3);
+				pdbFile << "  1.00  0.00\n";
 
 			}
 
