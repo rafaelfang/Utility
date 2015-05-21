@@ -464,6 +464,10 @@ void HHRImpl::findLocalAlign() {
 
 	}
 }
+
+void HHRImpl::write2PDB(){
+
+}
 void HHRImpl::findGlobalAlign() {
 	string proteinName;
 	int queryStart;
