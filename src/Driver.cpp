@@ -32,6 +32,7 @@ int main(int argc, char* argv[]) {
 		blaPDBImpl.setup3DCoords();
 		blaPDBImpl.findLocalAlign();
 		blaPDBImpl.findGlobalAlign();
+		blaPDBImpl.write2PDB();
 	}
 
 	// -blaNR T0837
