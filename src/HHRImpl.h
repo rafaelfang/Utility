@@ -22,6 +22,7 @@ public:
 	void write2Json();
 	void setup3DCoords();
 	void findLocalAlign();
+	void write2PDB();
 	void findGlobalAlign();
 	virtual ~HHRImpl();
 private:
