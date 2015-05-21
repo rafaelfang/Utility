@@ -363,11 +363,13 @@ void BLAPDBImpl::findLocalAlign() {
 	string proteinName;
 	int subjectStart;
 	string subject;
+	string query;
 	int subjectEnd;
 	for (int i = 0; i < blaPDBResultVector.size(); i++) {
 		proteinName = blaPDBResultVector[i].getProteinName();
 		subjectStart = blaPDBResultVector[i].getSubjectStart();
 		subject = blaPDBResultVector[i].getSubject();
+		query = blaPDBResultVector[i].getQuery();
 		subjectEnd = blaPDBResultVector[i].getSubjectEnd();
 		vector<float> Xs = blaPDBResultVector[i].getXCoords();
 		vector<float> Ys = blaPDBResultVector[i].getYCoords();
@@ -378,18 +380,19 @@ void BLAPDBImpl::findLocalAlign() {
 		protein3DCorrdsFilename += "/BLAPDB/local/";
 		protein3DCorrdsFilename += proteinName;
 		protein3DCorrdsFilename += "_";
-		protein3DCorrdsFilename += subject;
+		protein3DCorrdsFilename += query;
 		protein3DCorrdsFilename += ".json";
 		ofstream outJsonFile((char*) protein3DCorrdsFilename.c_str(), ios::out);
 		outJsonFile << "{\n";
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
 		for (int j = 1; j <= subject.size(); j++) {
-			if (subject[j] == '-') {
-				outJsonFile << "\"" << subject[j - 1] << "\":\""
-						<< "10000,10000,10000\"\n";
+			if (subject[j-1] == '-'||query[j-1]=='-') {
+				continue;
+				//outJsonFile << "\"" << subject[j - 1] << "\":\""
+					//	<< "10000,10000,10000\"\n";
 			} else {
 
-				outJsonFile << "\"" << subject[j - 1] << "\":\""
+				outJsonFile << "\"" << query[j - 1] << "\":\""
 						<< Xs[subjectStart + j - 1] << ","
 						<< Ys[subjectStart + j - 1] << ","
 						<< Zs[subjectStart + j - 1] << "\"\n";
@@ -456,12 +459,13 @@ void BLAPDBImpl::findGlobalAlign() {
 			headMore--;
 		}
 		for (int j = 1; j <= subject.size(); j++) {
-			if (subject[j] == '-') {
-				outJsonFile << "\"" << subject[j] << "\":\""
-						<< "10000,10000,10000\"\n";
+			if (subject[j-1] == '-'||query[j-1]=='-') {
+				continue;
+				//outJsonFile << "\"" << subject[j] << "\":\""
+					//	<< "10000,10000,10000\"\n";
 			} else {
 
-				outJsonFile << "\"" << subject[j - 1] << "\":\""
+				outJsonFile << "\"" << query[j - 1] << "\":\""
 						<< Xs[subjectStart + j - 1] << ","
 						<< Ys[subjectStart + j - 1] << ","
 						<< Zs[subjectStart + j - 1] << "\"\n";
