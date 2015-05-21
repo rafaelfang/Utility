@@ -11,6 +11,7 @@
 #include <cstdlib>
 #include <cstring>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <string>
 
@@ -46,6 +47,15 @@ void BLAPDBImpl::makeDirectory() {
 	sprintf(cmd3, "mkdir -p %s", (char*) outputFileGlobal3DFoldername.c_str());
 	//cout << cmd << endl;
 	system(cmd3);
+
+	char cmd4[500];
+	string outputFilePdb3DFoldername(outputFileLocation);
+	outputFilePdb3DFoldername += "/";
+	outputFilePdb3DFoldername += rootName;
+	outputFilePdb3DFoldername += "/BLAPDB/pdbFiles/";
+	sprintf(cmd4, "mkdir -p %s", (char*) outputFilePdb3DFoldername.c_str());
+	//cout << cmd << endl;
+	system(cmd4);
 }
 void BLAPDBImpl::populateResultVector() {
 
@@ -386,10 +396,10 @@ void BLAPDBImpl::findLocalAlign() {
 		outJsonFile << "{\n";
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
 		for (int j = 1; j <= subject.size(); j++) {
-			if (subject[j-1] == '-'||query[j-1]=='-') {
+			if (subject[j - 1] == '-' || query[j - 1] == '-') {
 				continue;
 				//outJsonFile << "\"" << subject[j - 1] << "\":\""
-					//	<< "10000,10000,10000\"\n";
+				//	<< "10000,10000,10000\"\n";
 			} else {
 
 				outJsonFile << "\"" << query[j - 1] << "\":\""
@@ -403,6 +413,60 @@ void BLAPDBImpl::findLocalAlign() {
 		outJsonFile.close();
 
 	}
+}
+
+void BLAPDBImpl::write2PDB() {
+	string proteinName;
+	int subjectStart;
+	string subject;
+	string query;
+	int subjectEnd;
+	for (int i = 0; i < blaPDBResultVector.size(); i++) {
+		proteinName = blaPDBResultVector[i].getProteinName();
+		subjectStart = blaPDBResultVector[i].getSubjectStart();
+		subject = blaPDBResultVector[i].getSubject();
+		query = blaPDBResultVector[i].getQuery();
+		subjectEnd = blaPDBResultVector[i].getSubjectEnd();
+		vector<float> Xs = blaPDBResultVector[i].getXCoords();
+		vector<float> Ys = blaPDBResultVector[i].getYCoords();
+		vector<float> Zs = blaPDBResultVector[i].getZCoords();
+		string protein3DCorrdsFilename(outputFileLocation);
+		protein3DCorrdsFilename += "/";
+		protein3DCorrdsFilename += rootName;
+		protein3DCorrdsFilename += "/BLAPDB/pdbFiles/";
+		protein3DCorrdsFilename += proteinName;
+		protein3DCorrdsFilename += "_";
+		protein3DCorrdsFilename += query;
+		protein3DCorrdsFilename += ".pdb";
+		ofstream pdbFile((char*) protein3DCorrdsFilename.c_str(), ios::out);
+
+		for (int j = 1; j <= subject.size(); j++) {
+			if (subject[j - 1] == '-' || query[j - 1] == '-') {
+				continue;
+				//outJsonFile << "\"" << subject[j - 1] << "\":\""
+				//	<< "10000,10000,10000\"\n";
+			} else {
+
+				pdbFile << "ATOM" << setw(6) //record name
+						<< subjectStart + j - 1<< setw(5) // atom serial number
+						<< "CA"<< setw(4) //atom name
+						<< setw(1) //alternate location indicator
+						<< convertResidueName(query.at(j - 1))
+						<< setw(3) //residue name
+						<< subjectStart + j - 1
+						<< setw(5) // atom serial number
+						<< Xs[subjectStart + j - 1] << setw(8)
+						<< Ys[subjectStart + j - 1] << setw(8)
+						<< Zs[subjectStart + j - 1] << setw(8) << "1.00 0.00\n";
+
+			}
+
+		}
+		pdbFile << "TER\n";
+		pdbFile.close();
+
+	}
+
 }
 void BLAPDBImpl::findGlobalAlign() {
 	string proteinName;
@@ -459,10 +523,10 @@ void BLAPDBImpl::findGlobalAlign() {
 			headMore--;
 		}
 		for (int j = 1; j <= subject.size(); j++) {
-			if (subject[j-1] == '-'||query[j-1]=='-') {
+			if (subject[j - 1] == '-' || query[j - 1] == '-') {
 				continue;
 				//outJsonFile << "\"" << subject[j] << "\":\""
-					//	<< "10000,10000,10000\"\n";
+				//	<< "10000,10000,10000\"\n";
 			} else {
 
 				outJsonFile << "\"" << query[j - 1] << "\":\""
