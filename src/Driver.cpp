@@ -55,6 +55,7 @@ int main(int argc, char* argv[]) {
 		hhrImpl.setup3DCoords();
 		hhrImpl.findLocalAlign();
 		hhrImpl.findGlobalAlign();
+		hhrImpl.write2PDB();
 	}
 
 	// -hhrNR T0837
