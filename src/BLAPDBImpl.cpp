@@ -450,12 +450,12 @@ void BLAPDBImpl::write2PDB() {
 				pdbFile << "ATOM  ";				//record name
 				pdbFile << right << setw(5) << subjectStart + j - 1; // atom serial number
 				pdbFile << "  CA  "; //atom name
-				pdbFile << convertResidueName(query.at(j - 1));
-				pdbFile << right << subjectStart + j - 1 << setw(6); // atom serial number
+				pdbFile << setw(3) << convertResidueName(query.at(j - 1));
+				pdbFile << right << setw(6) << subjectStart + j - 1; // atom serial number
 				pdbFile << "    ";
-				pdbFile << Xs[subjectStart + j - 1] << setw(8.3);
-				pdbFile << Ys[subjectStart + j - 1] << setw(8.3);
-				pdbFile << Zs[subjectStart + j - 1] << setw(8.3);
+				pdbFile << right << setw(8.3) << Xs[subjectStart + j - 1];
+				pdbFile << right << setw(8.3) << Ys[subjectStart + j - 1];
+				pdbFile << right << setw(8.3) << Zs[subjectStart + j - 1];
 				pdbFile << "  1.00  0.00\n";
 
 			}
