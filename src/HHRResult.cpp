@@ -191,3 +191,4 @@ HHRResult::~HHRResult() {
 	// TODO Auto-generated destructor stub
 }
 
+
