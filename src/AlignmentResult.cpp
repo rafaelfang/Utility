@@ -37,3 +37,11 @@ vector<float>& AlignmentResult::getZCoords() {
 void AlignmentResult::setZCoords(vector<float>& Zcoords) {
 	ZCoords = Zcoords;
 }
+
+vector<char>& AlignmentResult::getTemplateSeq() {
+	return templateSeq;
+}
+
+void AlignmentResult::setTemplateSeq(vector<char>& templateSeq) {
+	this->templateSeq = templateSeq;
+}
