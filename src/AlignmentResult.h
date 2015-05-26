@@ -8,6 +8,7 @@
 #ifndef ALIGNMENTRESULT_H_
 #define ALIGNMENTRESULT_H_
 
+#include <string>
 #include <vector>
 
 using namespace std;
@@ -22,12 +23,15 @@ public:
 	void setYCoords(vector<float>& coords);
 	vector<float>& getZCoords();
 	void setZCoords(vector<float>& coords);
+	 vector<char>& getTemplateSeq() ;
+	void setTemplateSeq( vector<char>& templateSeq);
 
 protected:
+
 	vector<float> XCoords;
 	vector<float> YCoords;
 	vector<float> ZCoords;
-
+	vector<char> templateSeq;
 };
 
 #endif /* ALIGNMENTRESULT_H_ */
