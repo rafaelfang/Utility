@@ -391,12 +391,17 @@ void HHRImpl::setup3DCoords() {
 		vector<float> Xs;
 		vector<float> Ys;
 		vector<float> Zs;
+		vector<char> templateSeq;
 		while (fgets(line, 3000, fptr) != NULL) {
 			if (strstr(line, ">Reference Sequence Info:") != NULL) {
 				fgets(line, 3000, fptr);
 				sscanf(line, "%s", proteinSeq);
 				string s(proteinSeq);
 				seqLength = s.size();
+				templateSeq.resize(seqLength+1);
+				for(int j=1;j<=seqLength;j++){
+					templateSeq[j]=s[j];
+				}
 				//cout<<seqLength<<endl;
 				continue;
 			}
@@ -422,6 +427,7 @@ void HHRImpl::setup3DCoords() {
 			}
 		}
 		fclose(fptr);
+		hhrResultVector[i].setTemplateSeq(templateSeq);
 		hhrResultVector[i].setXCoords(Xs);
 		hhrResultVector[i].setYCoords(Ys);
 		hhrResultVector[i].setZCoords(Zs);
@@ -547,6 +553,7 @@ void HHRImpl::findGlobalAlign() {
 		vector<float> Xs = hhrResultVector[i].getXCoords();
 		vector<float> Ys = hhrResultVector[i].getYCoords();
 		vector<float> Zs = hhrResultVector[i].getZCoords();
+		vector<char> templateSeq=hhrResultVector[i].getTemplateSeq();
 		int targetHeadMore = targetStart - 1;
 		int targetTailMore = Xs.size() - targetEnd;
 		int headMore = 0;
@@ -574,7 +581,7 @@ void HHRImpl::findGlobalAlign() {
 		outJsonFile << "{\n";
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
 		while (headMore > 0) {
-			outJsonFile << "\"" << "h" << "\":\"" << Xs[targetStart - headMore]
+			outJsonFile << "\"" << templateSeq[targetStart - headMore] << "\":\"" << Xs[targetStart - headMore]
 					<< "," << Ys[targetStart - headMore] << ","
 					<< Zs[targetStart - headMore] << "\"\n";
 			headMore--;
@@ -595,7 +602,7 @@ void HHRImpl::findGlobalAlign() {
 		}
 		if (tailMore > 0) {
 			for (int k = 1; k <= tailMore; k++) {
-				outJsonFile << "\"" << "t" << "\":\"" << Xs[targetEnd + k]
+				outJsonFile << "\"" << templateSeq[targetEnd + k] << "\":\"" << Xs[targetEnd + k]
 						<< "," << Ys[targetEnd + k] << "," << Zs[targetEnd + k]
 						<< "\"\n";
 			}
