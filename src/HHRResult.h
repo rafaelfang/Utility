@@ -61,6 +61,8 @@ public:
 	bool isSecondStateReached();
 	void setSecondStateReached(bool);
 
+
+
 private:
 
 	bool firstStateReached;
@@ -86,6 +88,7 @@ private:
 	string target;
 	string target_ss_pred;
 	string confidence;
+
 };
 
 #endif /* HHRRESULT_H_ */
