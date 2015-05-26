@@ -332,12 +332,17 @@ void BLAPDBImpl::setup3DCoords() {
 		vector<float> Xs;
 		vector<float> Ys;
 		vector<float> Zs;
+		vector<char> templateSeq;
 		while (fgets(line, 3000, fptr) != NULL) {
 			if (strstr(line, ">Reference Sequence Info:") != NULL) {
 				fgets(line, 3000, fptr);
 				sscanf(line, "%s", proteinSeq);
 				string s(proteinSeq);
 				seqLength = s.size();
+				templateSeq.resize(seqLength + 1);
+				for (int j = 1; j <= seqLength; j++) {
+					templateSeq[j] = s[j];
+				}
 				//cout<<seqLength<<endl;
 				continue;
 			}
@@ -363,6 +368,7 @@ void BLAPDBImpl::setup3DCoords() {
 			}
 		}
 		fclose(fptr);
+		blaPDBResultVector[i].setTemplateSeq(templateSeq);
 		blaPDBResultVector[i].setXCoords(Xs);
 		blaPDBResultVector[i].setYCoords(Ys);
 		blaPDBResultVector[i].setZCoords(Zs);
@@ -488,6 +494,7 @@ void BLAPDBImpl::findGlobalAlign() {
 		vector<float> Xs = blaPDBResultVector[i].getXCoords();
 		vector<float> Ys = blaPDBResultVector[i].getYCoords();
 		vector<float> Zs = blaPDBResultVector[i].getZCoords();
+		vector<char> templateSeq=blaPDBResultVector[i].getTemplateSeq();
 		int subjectHeadMore = subjectStart - 1;
 		int subjectTailMore = Xs.size() - subjectEnd;
 		int headMore = 0;
@@ -516,7 +523,7 @@ void BLAPDBImpl::findGlobalAlign() {
 		outJsonFile << "{\n";
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
 		while (headMore > 0) {
-			outJsonFile << "\"" << "h" << "\":\"" << Xs[subjectStart - headMore]
+			outJsonFile << "\"" << templateSeq[subjectStart - headMore] << "\":\"" << Xs[subjectStart - headMore]
 					<< "," << Ys[subjectStart - headMore] << ","
 					<< Zs[subjectStart - headMore] << "\"\n";
 			headMore--;
@@ -538,7 +545,7 @@ void BLAPDBImpl::findGlobalAlign() {
 		//cout<<"Tailmore"<<tailMore<<endl;;
 		if (tailMore > 0) {
 			for (int k = 1; k <= tailMore; k++) {
-				outJsonFile << "\"" << "t" << "\":\"" << Xs[subjectEnd + k]
+				outJsonFile << "\"" << templateSeq[subjectEnd + k] << "\":\"" << Xs[subjectEnd + k]
 						<< "," << Ys[subjectEnd + k] << ","
 						<< Zs[subjectEnd + k] << "\"\n";
 			}
