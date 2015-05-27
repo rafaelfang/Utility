@@ -425,54 +425,113 @@ void BLAPDBImpl::write2PDB() {
 	string proteinName;
 	int subjectStart;
 	string subject;
-	string query;
 	int subjectEnd;
+	int queryStart;
+	string query;
+	int queryEnd;
 	for (int i = 0; i < blaPDBResultVector.size(); i++) {
 		proteinName = blaPDBResultVector[i].getProteinName();
+		queryStart = blaPDBResultVector[i].getQueryStart();
+		query = blaPDBResultVector[i].getQuery();
+		queryEnd = blaPDBResultVector[i].getQueryEnd();
 		subjectStart = blaPDBResultVector[i].getSubjectStart();
 		subject = blaPDBResultVector[i].getSubject();
-		query = blaPDBResultVector[i].getQuery();
 		subjectEnd = blaPDBResultVector[i].getSubjectEnd();
+		int queryHeadMore = queryStart - 1;
+		int queryTailMore = proteinSeqLength - queryEnd;
 		vector<float> Xs = blaPDBResultVector[i].getXCoords();
 		vector<float> Ys = blaPDBResultVector[i].getYCoords();
 		vector<float> Zs = blaPDBResultVector[i].getZCoords();
+		vector<char> templateSeq = blaPDBResultVector[i].getTemplateSeq();
+		int subjectHeadMore = subjectStart - 1;
+		int subjectTailMore = Xs.size() - subjectEnd;
+		int headMore = 0;
+
+		if (queryHeadMore > subjectHeadMore) {
+			headMore = subjectHeadMore;
+		} else {
+			headMore = queryHeadMore;
+		}
+
+		int tailMore = 0;
+		if (queryTailMore > subjectTailMore) {
+			tailMore = subjectTailMore;
+		} else {
+			tailMore = queryTailMore;
+		}
 		string protein3DCorrdsFilename(outputFileLocation);
 		protein3DCorrdsFilename += "/";
 		protein3DCorrdsFilename += rootName;
 		protein3DCorrdsFilename += "/BLAPDB/pdbFiles/";
 		protein3DCorrdsFilename += proteinName;
 		protein3DCorrdsFilename += "_";
-		protein3DCorrdsFilename += query;
+		protein3DCorrdsFilename += subject;
 		protein3DCorrdsFilename += ".pdb";
 		ofstream pdbFile((char*) protein3DCorrdsFilename.c_str(), ios::out);
 
+		while (headMore > 0) {
+			pdbFile << "ATOM  ";				//record name
+			pdbFile << right << setw(5) << subjectStart - headMore; // atom serial number
+			pdbFile << "  CA  "; //atom name
+			pdbFile << setw(3)
+					<< convertResidueName(templateSeq[subjectStart - headMore]);
+			//pdbFile<<templateSeq[subjectStart - headMore];//for debug
+			pdbFile << right << setw(6) << subjectStart - headMore; // atom serial number
+			pdbFile << "    ";
+			pdbFile << right << setw(8.3) << Xs[subjectStart - headMore];
+			pdbFile << right << setw(8.3) << Ys[subjectStart - headMore];
+			pdbFile << right << setw(8.3) << Zs[subjectStart - headMore];
+			pdbFile << "  1.00  0.00\n";
+
+			headMore--;
+		}
 		for (int j = 1; j <= subject.size(); j++) {
-			if (subject[j - 1] == '-' || query[j - 1] == '-') {
+			if (subject[j - 1] == '-'
+					|| query[j - 1] == '-') {
 				continue;
-				//outJsonFile << "\"" << subject[j - 1] << "\":\""
+				//outJsonFile << "\"" << subject[j] << "\":\""
 				//	<< "10000,10000,10000\"\n";
 			} else {
 
 				pdbFile << "ATOM  ";				//record name
 				pdbFile << right << setw(5) << subjectStart + j - 1; // atom serial number
 				pdbFile << "  CA  "; //atom name
-				pdbFile << setw(3) << convertResidueName(query.at(j - 1));
+				pdbFile << setw(3)
+						<< convertResidueName(query[ j - 1]);
+				//pdbFile<<query[ j - 1]; //for dubug
 				pdbFile << right << setw(6) << subjectStart + j - 1; // atom serial number
 				pdbFile << "    ";
 				pdbFile << right << setw(8.3) << Xs[subjectStart + j - 1];
 				pdbFile << right << setw(8.3) << Ys[subjectStart + j - 1];
 				pdbFile << right << setw(8.3) << Zs[subjectStart + j - 1];
 				pdbFile << "  1.00  0.00\n";
+			}
 
+		}
+		//cout<<"Tailmore"<<tailMore<<endl;;
+		if (tailMore > 0) {
+			for (int k = 1; k <= tailMore; k++) {
+
+				pdbFile << "ATOM  ";				//record name
+				pdbFile << right << setw(5) << subjectEnd + k; // atom serial number
+				pdbFile << "  CA  "; //atom name
+				pdbFile << setw(3)
+						<< convertResidueName(templateSeq[subjectEnd + k]);
+				pdbFile << right << setw(6) << subjectEnd + k; // atom serial number
+				pdbFile << "    ";
+				pdbFile << right << setw(8.3) << Xs[subjectEnd + k];
+				pdbFile << right << setw(8.3) << Ys[subjectEnd + k];
+				pdbFile << right << setw(8.3) << Zs[subjectEnd + k];
+				pdbFile << "  1.00  0.00\n";
 			}
 
 		}
 		pdbFile << "TER\n";
 		pdbFile.close();
-
 	}
 
 }
+
 void BLAPDBImpl::findGlobalAlign() {
 	string proteinName;
 	int subjectStart;
@@ -494,7 +553,7 @@ void BLAPDBImpl::findGlobalAlign() {
 		vector<float> Xs = blaPDBResultVector[i].getXCoords();
 		vector<float> Ys = blaPDBResultVector[i].getYCoords();
 		vector<float> Zs = blaPDBResultVector[i].getZCoords();
-		vector<char> templateSeq=blaPDBResultVector[i].getTemplateSeq();
+		vector<char> templateSeq = blaPDBResultVector[i].getTemplateSeq();
 		int subjectHeadMore = subjectStart - 1;
 		int subjectTailMore = Xs.size() - subjectEnd;
 		int headMore = 0;
@@ -523,8 +582,9 @@ void BLAPDBImpl::findGlobalAlign() {
 		outJsonFile << "{\n";
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
 		while (headMore > 0) {
-			outJsonFile << "\"" << templateSeq[subjectStart - headMore] << "\":\"" << Xs[subjectStart - headMore]
-					<< "," << Ys[subjectStart - headMore] << ","
+			outJsonFile << "\"" << templateSeq[subjectStart - headMore]
+					<< "\":\"" << Xs[subjectStart - headMore] << ","
+					<< Ys[subjectStart - headMore] << ","
 					<< Zs[subjectStart - headMore] << "\"\n";
 			headMore--;
 		}
@@ -545,9 +605,9 @@ void BLAPDBImpl::findGlobalAlign() {
 		//cout<<"Tailmore"<<tailMore<<endl;;
 		if (tailMore > 0) {
 			for (int k = 1; k <= tailMore; k++) {
-				outJsonFile << "\"" << templateSeq[subjectEnd + k] << "\":\"" << Xs[subjectEnd + k]
-						<< "," << Ys[subjectEnd + k] << ","
-						<< Zs[subjectEnd + k] << "\"\n";
+				outJsonFile << "\"" << templateSeq[subjectEnd + k] << "\":\""
+						<< Xs[subjectEnd + k] << "," << Ys[subjectEnd + k]
+						<< "," << Zs[subjectEnd + k] << "\"\n";
 			}
 
 		}
