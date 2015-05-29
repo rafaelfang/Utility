@@ -529,19 +529,24 @@ void HHRImpl::write2PDB() {
 		ofstream pdbFile((char*) protein3DCorrdsFilename.c_str(), ios::out);
 
 		while (headMore > 0) {
+			if (Xs[targetStart - headMore] != 10000
+					&& Ys[targetStart - headMore] != 10000
+					&& Zs[targetStart - headMore] != 10000) {
+				pdbFile << "ATOM  ";				//record name
+				pdbFile << right << setw(5) << targetStart - headMore; // atom serial number
+				pdbFile << "  CA  "; //atom name
+				pdbFile << setw(3)
+						<< convertResidueName(
+								templateSeq[targetStart - headMore]);
+				//pdbFile<<templateSeq[subjectStart - headMore];//for debug
+				pdbFile << right << setw(6) << targetStart - headMore; // atom serial number
+				pdbFile << "    ";
+				pdbFile << right << setw(8.3) << Xs[targetStart - headMore];
+				pdbFile << right << setw(8.3) << Ys[targetStart - headMore];
+				pdbFile << right << setw(8.3) << Zs[targetStart - headMore];
+				pdbFile << "  1.00  0.00\n";
+			}
 
-			pdbFile << "ATOM  ";				//record name
-			pdbFile << right << setw(5) << targetStart - headMore; // atom serial number
-			pdbFile << "  CA  "; //atom name
-			pdbFile << setw(3)
-					<< convertResidueName(templateSeq[targetStart - headMore]);
-			//pdbFile<<templateSeq[subjectStart - headMore];//for debug
-			pdbFile << right << setw(6) << targetStart - headMore; // atom serial number
-			pdbFile << "    ";
-			pdbFile << right << setw(8.3) << Xs[targetStart - headMore];
-			pdbFile << right << setw(8.3) << Ys[targetStart - headMore];
-			pdbFile << right << setw(8.3) << Zs[targetStart - headMore];
-			pdbFile << "  1.00  0.00\n";
 			headMore--;
 		}
 		for (int j = 1; j <= target.size(); j++) {
@@ -550,36 +555,42 @@ void HHRImpl::write2PDB() {
 				//outJsonFile << "\"" << target[j - 1] << "\":\""
 				//	<< "10000,10000,10000\"\n";
 			} else {
-
-				pdbFile << "ATOM  ";				//record name
-				pdbFile << right << setw(5) << targetStart + j - 1; // atom serial number
-				pdbFile << "  CA  "; //atom name
-				pdbFile << setw(3) << convertResidueName(query[j - 1]);
-				//pdbFile<<query[ j - 1]; //for dubug
-				pdbFile << right << setw(6) << targetStart + j - 1; // atom serial number
-				pdbFile << "    ";
-				pdbFile << right << setw(8.3) << Xs[targetStart + j - 1];
-				pdbFile << right << setw(8.3) << Ys[targetStart + j - 1];
-				pdbFile << right << setw(8.3) << Zs[targetStart + j - 1];
-				pdbFile << "  1.00  0.00\n";
+				if (Xs[targetStart + j - 1] != 10000
+						&& Ys[targetStart + j - 1] != 10000
+						&& Zs[targetStart + j - 1] != 10000) {
+					pdbFile << "ATOM  ";				//record name
+					pdbFile << right << setw(5) << targetStart + j - 1; // atom serial number
+					pdbFile << "  CA  "; //atom name
+					pdbFile << setw(3) << convertResidueName(query[j - 1]);
+					//pdbFile<<query[ j - 1]; //for dubug
+					pdbFile << right << setw(6) << targetStart + j - 1; // atom serial number
+					pdbFile << "    ";
+					pdbFile << right << setw(8.3) << Xs[targetStart + j - 1];
+					pdbFile << right << setw(8.3) << Ys[targetStart + j - 1];
+					pdbFile << right << setw(8.3) << Zs[targetStart + j - 1];
+					pdbFile << "  1.00  0.00\n";
+				}
 
 			}
 
 		}
 		if (tailMore > 0) {
 			for (int k = 1; k <= tailMore; k++) {
+				if (Xs[targetEnd + k] != 10000 && Ys[targetEnd + k] != 10000
+						&& Zs[targetEnd + k] != 10000) {
+					pdbFile << "ATOM  ";				//record name
+					pdbFile << right << setw(5) << targetEnd + k; // atom serial number
+					pdbFile << "  CA  "; //atom name
+					pdbFile << setw(3)
+							<< convertResidueName(templateSeq[targetEnd + k]);
+					pdbFile << right << setw(6) << targetEnd + k; // atom serial number
+					pdbFile << "    ";
+					pdbFile << right << setw(8.3) << Xs[targetEnd + k];
+					pdbFile << right << setw(8.3) << Ys[targetEnd + k];
+					pdbFile << right << setw(8.3) << Zs[targetEnd + k];
+					pdbFile << "  1.00  0.00\n";
+				}
 
-				pdbFile << "ATOM  ";				//record name
-				pdbFile << right << setw(5) << targetEnd + k; // atom serial number
-				pdbFile << "  CA  "; //atom name
-				pdbFile << setw(3)
-						<< convertResidueName(templateSeq[targetEnd + k]);
-				pdbFile << right << setw(6) << targetEnd + k; // atom serial number
-				pdbFile << "    ";
-				pdbFile << right << setw(8.3) << Xs[targetEnd + k];
-				pdbFile << right << setw(8.3) << Ys[targetEnd + k];
-				pdbFile << right << setw(8.3) << Zs[targetEnd + k];
-				pdbFile << "  1.00  0.00\n";
 			}
 		}
 		pdbFile << "TER\n";
