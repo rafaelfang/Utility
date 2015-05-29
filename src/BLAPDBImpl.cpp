@@ -470,59 +470,69 @@ void BLAPDBImpl::write2PDB() {
 		ofstream pdbFile((char*) protein3DCorrdsFilename.c_str(), ios::out);
 
 		while (headMore > 0) {
-			pdbFile << "ATOM  ";				//record name
-			pdbFile << right << setw(5) << subjectStart - headMore; // atom serial number
-			pdbFile << "  CA  "; //atom name
-			pdbFile << setw(3)
-					<< convertResidueName(templateSeq[subjectStart - headMore]);
-			//pdbFile<<templateSeq[subjectStart - headMore];//for debug
-			pdbFile << right << setw(6) << subjectStart - headMore; // atom serial number
-			pdbFile << "    ";
-			pdbFile << right << setw(8.3) << Xs[subjectStart - headMore];
-			pdbFile << right << setw(8.3) << Ys[subjectStart - headMore];
-			pdbFile << right << setw(8.3) << Zs[subjectStart - headMore];
-			pdbFile << "  1.00  0.00\n";
+			if (Xs[subjectStart - headMore] != 10000
+					&& Ys[subjectStart - headMore] != 10000
+					&& Zs[subjectStart - headMore] != 10000) {
+				pdbFile << "ATOM  ";				//record name
+				pdbFile << right << setw(5) << subjectStart - headMore; // atom serial number
+				pdbFile << "  CA  "; //atom name
+				pdbFile << setw(3)
+						<< convertResidueName(
+								templateSeq[subjectStart - headMore]);
+				//pdbFile<<templateSeq[subjectStart - headMore];//for debug
+				pdbFile << right << setw(6) << subjectStart - headMore; // atom serial number
+				pdbFile << "    ";
+				pdbFile << right << setw(8.3) << Xs[subjectStart - headMore];
+				pdbFile << right << setw(8.3) << Ys[subjectStart - headMore];
+				pdbFile << right << setw(8.3) << Zs[subjectStart - headMore];
+				pdbFile << "  1.00  0.00\n";
+			}
 
 			headMore--;
 		}
 		for (int j = 1; j <= subject.size(); j++) {
-			if (subject[j - 1] == '-'
-					|| query[j - 1] == '-') {
+			if (subject[j - 1] == '-' || query[j - 1] == '-') {
 				continue;
 				//outJsonFile << "\"" << subject[j] << "\":\""
 				//	<< "10000,10000,10000\"\n";
 			} else {
+				if (Xs[subjectStart + j - 1] != 10000
+						&& Ys[subjectStart + j - 1] != 10000
+						&& Zs[subjectStart + j - 1] != 10000) {
+					pdbFile << "ATOM  ";				//record name
+					pdbFile << right << setw(5) << subjectStart + j - 1; // atom serial number
+					pdbFile << "  CA  "; //atom name
+					pdbFile << setw(3) << convertResidueName(query[j - 1]);
+					//pdbFile<<query[ j - 1]; //for dubug
+					pdbFile << right << setw(6) << subjectStart + j - 1; // atom serial number
+					pdbFile << "    ";
+					pdbFile << right << setw(8.3) << Xs[subjectStart + j - 1];
+					pdbFile << right << setw(8.3) << Ys[subjectStart + j - 1];
+					pdbFile << right << setw(8.3) << Zs[subjectStart + j - 1];
+					pdbFile << "  1.00  0.00\n";
+				}
 
-				pdbFile << "ATOM  ";				//record name
-				pdbFile << right << setw(5) << subjectStart + j - 1; // atom serial number
-				pdbFile << "  CA  "; //atom name
-				pdbFile << setw(3)
-						<< convertResidueName(query[ j - 1]);
-				//pdbFile<<query[ j - 1]; //for dubug
-				pdbFile << right << setw(6) << subjectStart + j - 1; // atom serial number
-				pdbFile << "    ";
-				pdbFile << right << setw(8.3) << Xs[subjectStart + j - 1];
-				pdbFile << right << setw(8.3) << Ys[subjectStart + j - 1];
-				pdbFile << right << setw(8.3) << Zs[subjectStart + j - 1];
-				pdbFile << "  1.00  0.00\n";
 			}
 
 		}
 		//cout<<"Tailmore"<<tailMore<<endl;;
 		if (tailMore > 0) {
 			for (int k = 1; k <= tailMore; k++) {
+				if (Xs[subjectEnd + k] != 10000 && Ys[subjectEnd + k] != 10000
+						&& Zs[subjectEnd + k] != 10000) {
+					pdbFile << "ATOM  ";				//record name
+					pdbFile << right << setw(5) << subjectEnd + k; // atom serial number
+					pdbFile << "  CA  "; //atom name
+					pdbFile << setw(3)
+							<< convertResidueName(templateSeq[subjectEnd + k]);
+					pdbFile << right << setw(6) << subjectEnd + k; // atom serial number
+					pdbFile << "    ";
+					pdbFile << right << setw(8.3) << Xs[subjectEnd + k];
+					pdbFile << right << setw(8.3) << Ys[subjectEnd + k];
+					pdbFile << right << setw(8.3) << Zs[subjectEnd + k];
+					pdbFile << "  1.00  0.00\n";
+				}
 
-				pdbFile << "ATOM  ";				//record name
-				pdbFile << right << setw(5) << subjectEnd + k; // atom serial number
-				pdbFile << "  CA  "; //atom name
-				pdbFile << setw(3)
-						<< convertResidueName(templateSeq[subjectEnd + k]);
-				pdbFile << right << setw(6) << subjectEnd + k; // atom serial number
-				pdbFile << "    ";
-				pdbFile << right << setw(8.3) << Xs[subjectEnd + k];
-				pdbFile << right << setw(8.3) << Ys[subjectEnd + k];
-				pdbFile << right << setw(8.3) << Zs[subjectEnd + k];
-				pdbFile << "  1.00  0.00\n";
 			}
 
 		}
@@ -582,10 +592,12 @@ void BLAPDBImpl::findGlobalAlign() {
 		outJsonFile << "{\n";
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
 		while (headMore > 0) {
+
 			outJsonFile << "\"" << templateSeq[subjectStart - headMore]
 					<< "\":\"" << Xs[subjectStart - headMore] << ","
 					<< Ys[subjectStart - headMore] << ","
 					<< Zs[subjectStart - headMore] << "\"\n";
+
 			headMore--;
 		}
 		for (int j = 1; j <= subject.size(); j++) {
@@ -599,15 +611,18 @@ void BLAPDBImpl::findGlobalAlign() {
 						<< Xs[subjectStart + j - 1] << ","
 						<< Ys[subjectStart + j - 1] << ","
 						<< Zs[subjectStart + j - 1] << "\"\n";
+
 			}
 
 		}
 		//cout<<"Tailmore"<<tailMore<<endl;;
 		if (tailMore > 0) {
 			for (int k = 1; k <= tailMore; k++) {
+
 				outJsonFile << "\"" << templateSeq[subjectEnd + k] << "\":\""
 						<< Xs[subjectEnd + k] << "," << Ys[subjectEnd + k]
 						<< "," << Zs[subjectEnd + k] << "\"\n";
+
 			}
 
 		}
