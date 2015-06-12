@@ -65,78 +65,84 @@ void UtilityInterface::findProteinSeqLength() {
 	fgets(line, 500, fptr);
 	fgets(line, 500, fptr);
 
-	proteinSeqLength = strlen(line) - 1; //should not count the "\0"
+	proteinSeqLength = strlen(line);
+
+	originalProteinSeq.resize(proteinSeqLength);
+	for (int j = 0; j < proteinSeqLength; j++) {
+		originalProteinSeq[j] = line[j];
+	}
 	//cout<<"proteinSeqLength"<<proteinSeqLength<<endl;
+
 	fclose(fptr);
 }
 
 string UtilityInterface::convertResidueName(const char residueName) {
-	if (residueName=='A') {
+	if (residueName == 'A') {
 		return "ALA";
 	}
 
-	if (residueName=='R') {
+	if (residueName == 'R') {
 		return "ARG";
 	}
 
-	if (residueName=='N') {
+	if (residueName == 'N') {
 		return "ASN";
 	}
-	if (residueName=='D') {
+	if (residueName == 'D') {
 		return "ASP";
 	}
-	if (residueName=='B') {
+	if (residueName == 'B') {
 		return "ASX";
 	}
-	if (residueName=='C') {
+	if (residueName == 'C') {
 		return "CYS";
 	}
-	if (residueName=='Q') {
+	if (residueName == 'Q') {
 		return "GLN";
 	}
-	if (residueName=='E') {
+	if (residueName == 'E') {
 		return "GLU";
 	}
-	if (residueName=='Z') {
+	if (residueName == 'Z') {
 		return "GLX";
 	}
-	if (residueName=='G') {
+	if (residueName == 'G') {
 		return "GLY";
 	}
-	if (residueName=='H') {
+	if (residueName == 'H') {
 		return "HIS";
 	}
-	if (residueName=='I') {
+	if (residueName == 'I') {
 		return "ILE";
 	}
-	if (residueName=='L') {
+	if (residueName == 'L') {
 		return "LEU";
 	}
-	if (residueName=='K') {
+	if (residueName == 'K') {
 		return "LYS";
 	}
-	if (residueName=='M') {
+	if (residueName == 'M') {
 		return "MET";
 	}
-	if (residueName=='F') {
+	if (residueName == 'F') {
 		return "PHE";
 	}
-	if (residueName=='P') {
+	if (residueName == 'P') {
 		return "PRO";
 	}
-	if (residueName=='S') {
+	if (residueName == 'S') {
 		return "SER";
 	}
-	if (residueName=='T') {
+	if (residueName == 'T') {
 		return "THR";
 	}
-	if (residueName=='W') {
+	if (residueName == 'W') {
 		return "TRP";
 	}
-	if (residueName=='Y') {
+	if (residueName == 'Y') {
 		return "TYR";
 	}
-	if (residueName=='V') {
+	if (residueName == 'V') {
 		return "VAL";
 	}
 	return "INVALID NAME";
