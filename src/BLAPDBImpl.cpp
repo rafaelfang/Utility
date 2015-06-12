@@ -478,7 +478,7 @@ void BLAPDBImpl::write2PDB() {
 				pdbFile << "  CA  "; //atom name
 				pdbFile << setw(3)
 						<< convertResidueName(
-								templateSeq[subjectStart - headMore]);
+								originalProteinSeq[queryStart - headMore]);
 				//pdbFile<<templateSeq[subjectStart - headMore];//for debug
 				pdbFile << right << setw(6) << subjectStart - headMore; // atom serial number
 				pdbFile << "    ";
@@ -524,7 +524,7 @@ void BLAPDBImpl::write2PDB() {
 					pdbFile << right << setw(5) << subjectEnd + k; // atom serial number
 					pdbFile << "  CA  "; //atom name
 					pdbFile << setw(3)
-							<< convertResidueName(templateSeq[subjectEnd + k]);
+							<< convertResidueName(originalProteinSeq[queryEnd + k]);
 					pdbFile << right << setw(6) << subjectEnd + k; // atom serial number
 					pdbFile << "    ";
 					pdbFile << right << setw(8.3) << Xs[subjectEnd + k];
@@ -593,7 +593,7 @@ void BLAPDBImpl::findGlobalAlign() {
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
 		while (headMore > 0) {
 
-			outJsonFile << "\"" << templateSeq[subjectStart - headMore]
+			outJsonFile << "\"" << originalProteinSeq[queryStart - headMore]
 					<< "\":\"" << Xs[subjectStart - headMore] << ","
 					<< Ys[subjectStart - headMore] << ","
 					<< Zs[subjectStart - headMore] << "\"\n";
@@ -619,7 +619,7 @@ void BLAPDBImpl::findGlobalAlign() {
 		if (tailMore > 0) {
 			for (int k = 1; k <= tailMore; k++) {
 
-				outJsonFile << "\"" << templateSeq[subjectEnd + k] << "\":\""
+				outJsonFile << "\"" << originalProteinSeq[queryEnd + k] << "\":\""
 						<< Xs[subjectEnd + k] << "," << Ys[subjectEnd + k]
 						<< "," << Zs[subjectEnd + k] << "\"\n";
 
