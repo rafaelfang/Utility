@@ -398,28 +398,28 @@ void HHRImpl::setup3DCoords() {
 				sscanf(line, "%s", proteinSeq);
 				string s(proteinSeq);
 				seqLength = s.size();
-				templateSeq.resize(seqLength + 1);
-				for (int j = 1; j <= seqLength; j++) {
+				templateSeq.resize(seqLength);
+				for (int j = 0; j < seqLength; j++) {
 					templateSeq[j] = s[j];
 				}
 				//cout<<seqLength<<endl;
 				continue;
 			}
 			if (strstr(line, ">Ca XYZ:") != NULL) {
-				Xs.resize(seqLength + 1);
-				Ys.resize(seqLength + 1);
-				Zs.resize(seqLength + 1);
+				Xs.resize(seqLength);
+				Ys.resize(seqLength);
+				Zs.resize(seqLength);
 
 				float temp;
-				for (int j = 1; j <= seqLength; j++) {
+				for (int j = 0; j < seqLength; j++) {
 					fscanf(fptr, "%f", &temp);
 					Xs[j] = temp;
 				}
-				for (int j = 1; j <= seqLength; j++) {
+				for (int j = 0; j < seqLength; j++) {
 					fscanf(fptr, "%f", &temp);
 					Ys[j] = temp;
 				}
-				for (int j = 1; j <= seqLength; j++) {
+				for (int j = 0; j < seqLength; j++) {
 					fscanf(fptr, "%f", &temp);
 					Zs[j] = temp;
 				}
@@ -461,17 +461,16 @@ void HHRImpl::findLocalAlign() {
 		ofstream outJsonFile((char*) protein3DCorrdsFilename.c_str(), ios::out);
 		outJsonFile << "{\n";
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
-		for (int j = 1; j <= query.size(); j++) {
-			if (target[j - 1] == '-' || query[j - 1] == '-') {
+		for (int j = 0; j < query.size(); j++) {
+			if (target[j] == '-' || query[j] == '-') {
 				continue;
 				//outJsonFile << "\"" << target[j-1] << "\":\""
 				//		<< "10000,10000,10000\"\n";
 			} else {
 
-				outJsonFile << "\"" << query[j - 1] << "\":\""
-						<< Xs[targetStart + j - 1] << ","
-						<< Ys[targetStart + j - 1] << ","
-						<< Zs[targetStart + j - 1] << "\"\n";
+				outJsonFile << "\"" << query[j] << "\":\""
+						<< Xs[targetStart + j] << "," << Ys[targetStart + j]
+						<< "," << Zs[targetStart + j] << "\"\n";
 			}
 
 		}
@@ -537,7 +536,7 @@ void HHRImpl::write2PDB() {
 				pdbFile << "  CA  "; //atom name
 				pdbFile << setw(3)
 						<< convertResidueName(
-								templateSeq[targetStart - headMore]);
+								originalProteinSeq[queryStart - headMore]);
 				//pdbFile<<templateSeq[subjectStart - headMore];//for debug
 				pdbFile << right << setw(6) << targetStart - headMore; // atom serial number
 				pdbFile << "    ";
@@ -549,25 +548,24 @@ void HHRImpl::write2PDB() {
 
 			headMore--;
 		}
-		for (int j = 1; j <= target.size(); j++) {
-			if (target[j - 1] == '-' || query[j - 1] == '-') {
+		for (int j = 0; j < target.size(); j++) {
+			if (target[j] == '-' || query[j] == '-') {
 				continue;
 				//outJsonFile << "\"" << target[j - 1] << "\":\""
 				//	<< "10000,10000,10000\"\n";
 			} else {
-				if (Xs[targetStart + j - 1] != 10000
-						&& Ys[targetStart + j - 1] != 10000
-						&& Zs[targetStart + j - 1] != 10000) {
+				if (Xs[targetStart + j] != 10000 && Ys[targetStart + j] != 10000
+						&& Zs[targetStart + j] != 10000) {
 					pdbFile << "ATOM  ";				//record name
-					pdbFile << right << setw(5) << targetStart + j - 1; // atom serial number
+					pdbFile << right << setw(5) << targetStart + j; // atom serial number
 					pdbFile << "  CA  "; //atom name
-					pdbFile << setw(3) << convertResidueName(query[j - 1]);
+					pdbFile << setw(3) << convertResidueName(query[j]);
 					//pdbFile<<query[ j - 1]; //for dubug
-					pdbFile << right << setw(6) << targetStart + j - 1; // atom serial number
+					pdbFile << right << setw(6) << targetStart + j; // atom serial number
 					pdbFile << "    ";
-					pdbFile << right << setw(8.3) << Xs[targetStart + j - 1];
-					pdbFile << right << setw(8.3) << Ys[targetStart + j - 1];
-					pdbFile << right << setw(8.3) << Zs[targetStart + j - 1];
+					pdbFile << right << setw(8.3) << Xs[targetStart + j];
+					pdbFile << right << setw(8.3) << Ys[targetStart + j];
+					pdbFile << right << setw(8.3) << Zs[targetStart + j];
 					pdbFile << "  1.00  0.00\n";
 				}
 
@@ -582,7 +580,7 @@ void HHRImpl::write2PDB() {
 					pdbFile << right << setw(5) << targetEnd + k; // atom serial number
 					pdbFile << "  CA  "; //atom name
 					pdbFile << setw(3)
-							<< convertResidueName(templateSeq[targetEnd + k]);
+							<< convertResidueName(originalProteinSeq[queryEnd + k]);
 					pdbFile << right << setw(6) << targetEnd + k; // atom serial number
 					pdbFile << "    ";
 					pdbFile << right << setw(8.3) << Xs[targetEnd + k];
@@ -646,29 +644,28 @@ void HHRImpl::findGlobalAlign() {
 		outJsonFile << "{\n";
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
 		while (headMore > 0) {
-			outJsonFile << "\"" << templateSeq[targetStart - headMore]
+			outJsonFile << "\"" << originalProteinSeq[queryStart - headMore]
 					<< "\":\"" << Xs[targetStart - headMore] << ","
 					<< Ys[targetStart - headMore] << ","
 					<< Zs[targetStart - headMore] << "\"\n";
 			headMore--;
 		}
-		for (int j = 1; j <= target.size(); j++) {
-			if (target[j - 1] == '-' || query[j - 1] == '-') {
+		for (int j = 0; j < target.size(); j++) {
+			if (target[j] == '-' || query[j] == '-') {
 				continue;
 				//outJsonFile << "\"" << target[j - 1] << "\":\""
 				//	<< "10000,10000,10000\"\n";
 			} else {
 
-				outJsonFile << "\"" << target[j - 1] << "\":\""
-						<< Xs[targetStart + j - 1] << ","
-						<< Ys[targetStart + j - 1] << ","
-						<< Zs[targetStart + j - 1] << "\"\n";
+				outJsonFile << "\"" << target[j] << "\":\""
+						<< Xs[targetStart + j] << "," << Ys[targetStart + j]
+						<< "," << Zs[targetStart + j] << "\"\n";
 			}
 
 		}
 		if (tailMore > 0) {
 			for (int k = 1; k <= tailMore; k++) {
-				outJsonFile << "\"" << templateSeq[targetEnd + k] << "\":\""
+				outJsonFile << "\"" << originalProteinSeq[queryEnd + k] << "\":\""
 						<< Xs[targetEnd + k] << "," << Ys[targetEnd + k] << ","
 						<< Zs[targetEnd + k] << "\"\n";
 			}
