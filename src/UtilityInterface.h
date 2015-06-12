@@ -9,6 +9,7 @@
 #define UTILITYINTERFACE_H_
 
 #include <string>
+#include <vector>
 
 using namespace std;
 class UtilityInterface {
@@ -37,6 +38,7 @@ protected:
 	string DBInfoLocation;
 	string proteinLocation;
 	int proteinSeqLength;
+	vector<char> originalProteinSeq;
 };
 
 #endif /* UTILITYINTERFACE_H_ */
