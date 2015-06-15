@@ -9,6 +9,7 @@
 
 #include <stdio.h>
 #include <cstring>
+#include <cwchar>
 #include <fstream>
 #include <iostream>
 
@@ -64,6 +65,10 @@ void UtilityInterface::findProteinSeqLength() {
 	char line[500];
 	fgets(line, 500, fptr);
 	fgets(line, 500, fptr);
+	char *pos;
+	if ((pos=strchr(line, '\n')) != NULL){
+		  *pos = '\0';
+	}
 
 	proteinSeqLength = strlen(line);
 
