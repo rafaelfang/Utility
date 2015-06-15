@@ -337,6 +337,7 @@ void HHRImpl::write2Json() {
 				<< "\",\n";
 		outputFile << "\t\"OriginalSequenceLength\":\"" << proteinSeqLength
 				<< "\",\n";
+
 		outputFile << "\t\"eValue\":\"" << hhrResultVector[i].getExpect()
 				<< "\",\n";
 		outputFile << "\t\"score\":\"" << hhrResultVector[i].getScore()
@@ -413,22 +414,30 @@ void HHRImpl::setup3DCoords() {
 				Zs.resize(seqLength);
 
 				float temp;
+				//cout << proteinDBFilename << endl;
 				for (int j = 0; j < seqLength; j++) {
 					fscanf(fptr, "%f", &temp);
 					Xs[j] = temp;
+					//cout<< Xs[j] << " ";
 				}
+				//cout<<"==============X========"<<endl;
 				for (int j = 0; j < seqLength; j++) {
 					fscanf(fptr, "%f", &temp);
 					Ys[j] = temp;
+					//cout<< Ys[j] << " ";
 				}
+				//cout<<"==============Y========"<<endl;
 				for (int j = 0; j < seqLength; j++) {
 					fscanf(fptr, "%f", &temp);
 					Zs[j] = temp;
+					//cout<< Zs[j] << " ";
 				}
+				//cout<<"==============Z========"<<endl;
 				break;
 			}
 		}
 		fclose(fptr);
+		//cout << "---------" << seqLength << endl;
 		hhrResultVector[i].setTemplateSeq(templateSeq);
 		hhrResultVector[i].setXCoords(Xs);
 		hhrResultVector[i].setYCoords(Ys);
@@ -463,16 +472,24 @@ void HHRImpl::findLocalAlign() {
 		ofstream outJsonFile((char*) protein3DCorrdsFilename.c_str(), ios::out);
 		outJsonFile << "{\n";
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
+
+		int offset = 0;
 		for (int j = 0; j < query.size(); j++) {
-			if (target[j] == '-' || query[j] == '-') {
+			if (target[j] == '-' && query[j] != '-') {
 				continue;
 				//outJsonFile << "\"" << target[j-1] << "\":\""
 				//		<< "10000,10000,10000\"\n";
+			} else if (target[j] != '-' && query[j] == '-') {
+				offset++;
+				continue;
+			} else if (target[j] == '-' && query[j] == '-') {
+				continue;
 			} else {
-
 				outJsonFile << "\"" << query[j] << "\":\""
-						<< Xs[targetStart + j] << "," << Ys[targetStart + j]
-						<< "," << Zs[targetStart + j] << "\"\n";
+						<< Xs[targetStart + offset - 1] << ","
+						<< Ys[targetStart + offset - 1] << ","
+						<< Zs[targetStart + offset - 1] << "\"\n";
+				offset++;
 			}
 
 		}
@@ -519,6 +536,7 @@ void HHRImpl::write2PDB() {
 		} else {
 			tailMore = queryTailMore;
 		}
+		cout<<tailMore<<"tailmore"<<endl;
 		string protein3DCorrdsFilename(outputFileLocation);
 		protein3DCorrdsFilename += "/";
 		protein3DCorrdsFilename += rootName;
@@ -530,44 +548,52 @@ void HHRImpl::write2PDB() {
 		ofstream pdbFile((char*) protein3DCorrdsFilename.c_str(), ios::out);
 
 		while (headMore > 0) {
-			if (Xs[targetStart - headMore] != 10000
-					&& Ys[targetStart - headMore] != 10000
-					&& Zs[targetStart - headMore] != 10000) {
+			if (Xs[targetStart - headMore - 1] != 10000
+					&& Ys[targetStart - headMore - 1] != 10000
+					&& Zs[targetStart - headMore - 1] != 10000) {
 				pdbFile << "ATOM  ";				//record name
 				pdbFile << right << setw(5) << targetStart - headMore; // atom serial number
 				pdbFile << "  CA  "; //atom name
 				pdbFile << setw(3)
 						<< convertResidueName(
-								originalProteinSeq[queryStart - headMore]);
+								originalProteinSeq[queryStart - headMore - 1]);
 				//pdbFile<<templateSeq[subjectStart - headMore];//for debug
 				pdbFile << right << setw(6) << targetStart - headMore; // atom serial number
 				pdbFile << "    ";
-				pdbFile << right << setw(8.3) << Xs[targetStart - headMore];
-				pdbFile << right << setw(8.3) << Ys[targetStart - headMore];
-				pdbFile << right << setw(8.3) << Zs[targetStart - headMore];
+				pdbFile << right << setw(8.3) << Xs[targetStart - headMore - 1];
+				pdbFile << right << setw(8.3) << Ys[targetStart - headMore - 1];
+				pdbFile << right << setw(8.3) << Zs[targetStart - headMore - 1];
 				pdbFile << "  1.00  0.00\n";
 			}
 
 			headMore--;
 		}
+		int offset = 0;
 		for (int j = 0; j < target.size(); j++) {
-			if (target[j] == '-' || query[j] == '-') {
+
+			if (target[j] == '-' && query[j] != '-') {
 				continue;
-				//outJsonFile << "\"" << target[j - 1] << "\":\""
-				//	<< "10000,10000,10000\"\n";
+				//outJsonFile << "\"" << target[j-1] << "\":\""
+				//		<< "10000,10000,10000\"\n";
+			} else if (target[j] != '-' && query[j] == '-') {
+				offset++;
+				continue;
+			} else if (target[j] == '-' && query[j] == '-') {
+				continue;
 			} else {
-				if (Xs[targetStart + j] != 10000 && Ys[targetStart + j] != 10000
-						&& Zs[targetStart + j] != 10000) {
+				if (Xs[targetStart + j - 1] != 10000
+						&& Ys[targetStart + j - 1] != 10000
+						&& Zs[targetStart + j - 1] != 10000) {
 					pdbFile << "ATOM  ";				//record name
-					pdbFile << right << setw(5) << targetStart + j; // atom serial number
-					pdbFile << "  CA  "; //atom name
+					pdbFile << right << setw(5) << targetStart + j;	// atom serial number
+					pdbFile << "  CA  ";				//atom name
 					pdbFile << setw(3) << convertResidueName(query[j]);
 					//pdbFile<<query[ j - 1]; //for dubug
-					pdbFile << right << setw(6) << targetStart + j; // atom serial number
+					pdbFile << right << setw(6) << targetStart + j;	// atom serial number
 					pdbFile << "    ";
-					pdbFile << right << setw(8.3) << Xs[targetStart + j];
-					pdbFile << right << setw(8.3) << Ys[targetStart + j];
-					pdbFile << right << setw(8.3) << Zs[targetStart + j];
+					pdbFile << right << setw(8.3) << Xs[targetStart + j - 1];
+					pdbFile << right << setw(8.3) << Ys[targetStart + j - 1];
+					pdbFile << right << setw(8.3) << Zs[targetStart + j - 1];
 					pdbFile << "  1.00  0.00\n";
 				}
 
@@ -575,7 +601,7 @@ void HHRImpl::write2PDB() {
 
 		}
 		if (tailMore > 0) {
-			for (int k = 1; k <= tailMore; k++) {
+			for (int k = 0; k < tailMore; k++) {
 				if (Xs[targetEnd + k] != 10000 && Ys[targetEnd + k] != 10000
 						&& Zs[targetEnd + k] != 10000) {
 					pdbFile << "ATOM  ";				//record name
@@ -594,6 +620,7 @@ void HHRImpl::write2PDB() {
 
 			}
 		}
+
 		pdbFile << "TER\n";
 		pdbFile.close();
 	}
@@ -647,27 +674,34 @@ void HHRImpl::findGlobalAlign() {
 		outJsonFile << "{\n";
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
 		while (headMore > 0) {
-			outJsonFile << "\"" << originalProteinSeq[queryStart - headMore]
-					<< "\":\"" << Xs[targetStart - headMore] << ","
-					<< Ys[targetStart - headMore] << ","
-					<< Zs[targetStart - headMore] << "\"\n";
+			outJsonFile << "\"" << originalProteinSeq[queryStart - headMore - 1]
+					<< "\":\"" << Xs[targetStart - headMore - 1] << ","
+					<< Ys[targetStart - headMore - 1] << ","
+					<< Zs[targetStart - headMore - 1] << "\"\n";
 			headMore--;
 		}
+		int offset = 0;
 		for (int j = 0; j < target.size(); j++) {
-			if (target[j] == '-' || query[j] == '-') {
+			if (target[j] == '-' && query[j] != '-') {
 				continue;
-				//outJsonFile << "\"" << target[j - 1] << "\":\""
-				//	<< "10000,10000,10000\"\n";
+				//outJsonFile << "\"" << target[j-1] << "\":\""
+				//		<< "10000,10000,10000\"\n";
+			} else if (target[j] != '-' && query[j] == '-') {
+				offset++;
+				continue;
+			} else if (target[j] == '-' && query[j] == '-') {
+				continue;
 			} else {
-
-				outJsonFile << "\"" << target[j] << "\":\""
-						<< Xs[targetStart + j] << "," << Ys[targetStart + j]
-						<< "," << Zs[targetStart + j] << "\"\n";
+				outJsonFile << "\"" << query[j] << "\":\""
+						<< Xs[targetStart + offset - 1] << ","
+						<< Ys[targetStart + offset - 1] << ","
+						<< Zs[targetStart + offset - 1] << "\"\n";
+				offset++;
 			}
 
 		}
 		if (tailMore > 0) {
-			for (int k = 1; k <= tailMore; k++) {
+			for (int k = 0; k < tailMore; k++) {
 				outJsonFile << "\"" << originalProteinSeq[queryEnd + k]
 						<< "\":\"" << Xs[targetEnd + k] << ","
 						<< Ys[targetEnd + k] << "," << Zs[targetEnd + k]
