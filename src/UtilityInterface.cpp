@@ -148,3 +148,4 @@ string UtilityInterface::convertResidueName(const char residueName) {
 	return "INVALID NAME";
 }
 
+
