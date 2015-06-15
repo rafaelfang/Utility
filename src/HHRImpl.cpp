@@ -335,6 +335,8 @@ void HHRImpl::write2Json() {
 				<< hhrResultVector[i].getProteinName() << "\",\n";
 		outputFile << "\t\"probab\":\"" << hhrResultVector[i].getProbab()
 				<< "\",\n";
+		outputFile << "\t\"OriginalSequenceLength\":\"" << proteinSeqLength
+				<< "\",\n";
 		outputFile << "\t\"eValue\":\"" << hhrResultVector[i].getExpect()
 				<< "\",\n";
 		outputFile << "\t\"score\":\"" << hhrResultVector[i].getScore()
@@ -580,7 +582,8 @@ void HHRImpl::write2PDB() {
 					pdbFile << right << setw(5) << targetEnd + k; // atom serial number
 					pdbFile << "  CA  "; //atom name
 					pdbFile << setw(3)
-							<< convertResidueName(originalProteinSeq[queryEnd + k]);
+							<< convertResidueName(
+									originalProteinSeq[queryEnd + k]);
 					pdbFile << right << setw(6) << targetEnd + k; // atom serial number
 					pdbFile << "    ";
 					pdbFile << right << setw(8.3) << Xs[targetEnd + k];
@@ -665,9 +668,10 @@ void HHRImpl::findGlobalAlign() {
 		}
 		if (tailMore > 0) {
 			for (int k = 1; k <= tailMore; k++) {
-				outJsonFile << "\"" << originalProteinSeq[queryEnd + k] << "\":\""
-						<< Xs[targetEnd + k] << "," << Ys[targetEnd + k] << ","
-						<< Zs[targetEnd + k] << "\"\n";
+				outJsonFile << "\"" << originalProteinSeq[queryEnd + k]
+						<< "\":\"" << Xs[targetEnd + k] << ","
+						<< Ys[targetEnd + k] << "," << Zs[targetEnd + k]
+						<< "\"\n";
 			}
 		}
 		outJsonFile << "}\n";
