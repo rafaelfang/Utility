@@ -552,13 +552,13 @@ void HHRImpl::write2PDB() {
 					&& Ys[targetStart - headMore - 1] != 10000
 					&& Zs[targetStart - headMore - 1] != 10000) {
 				pdbFile << "ATOM  ";				//record name
-				pdbFile << right << setw(5) << targetStart - headMore; // atom serial number
+				pdbFile << right << setw(5) << queryStart - headMore; // atom serial number
 				pdbFile << "  CA  "; //atom name
 				pdbFile << setw(3)
 						<< convertResidueName(
 								originalProteinSeq[queryStart - headMore - 1]);
 				//pdbFile<<templateSeq[subjectStart - headMore];//for debug
-				pdbFile << right << setw(6) << targetStart - headMore; // atom serial number
+				pdbFile << right << setw(6) << queryStart - headMore; // atom serial number
 				pdbFile << "    ";
 				pdbFile << right << setw(8.3) << Xs[targetStart - headMore - 1];
 				pdbFile << right << setw(8.3) << Ys[targetStart - headMore - 1];
@@ -568,28 +568,31 @@ void HHRImpl::write2PDB() {
 
 			headMore--;
 		}
-		int offset = 0;
+		int numberOfMinusign = 0;
+
 		for (int j = 0; j < target.size(); j++) {
 
 			if (target[j] == '-' && query[j] != '-') {
+				numberOfMinusign++;
 				continue;
 				//outJsonFile << "\"" << target[j-1] << "\":\""
 				//		<< "10000,10000,10000\"\n";
 			} else if (target[j] != '-' && query[j] == '-') {
-				offset++;
+				numberOfMinusign++;
 				continue;
 			} else if (target[j] == '-' && query[j] == '-') {
+				numberOfMinusign++;
 				continue;
 			} else {
 				if (Xs[targetStart + j - 1] != 10000
 						&& Ys[targetStart + j - 1] != 10000
 						&& Zs[targetStart + j - 1] != 10000) {
 					pdbFile << "ATOM  ";				//record name
-					pdbFile << right << setw(5) << targetStart + j;	// atom serial number
+					pdbFile << right << setw(5) << queryStart + j-numberOfMinusign;	// atom serial number
 					pdbFile << "  CA  ";				//atom name
 					pdbFile << setw(3) << convertResidueName(query[j]);
 					//pdbFile<<query[ j - 1]; //for dubug
-					pdbFile << right << setw(6) << targetStart + j;	// atom serial number
+					pdbFile << right << setw(6) << queryStart + j-numberOfMinusign;	// atom serial number
 					pdbFile << "    ";
 					pdbFile << right << setw(8.3) << Xs[targetStart + j - 1];
 					pdbFile << right << setw(8.3) << Ys[targetStart + j - 1];
@@ -605,12 +608,12 @@ void HHRImpl::write2PDB() {
 				if (Xs[targetEnd + k] != 10000 && Ys[targetEnd + k] != 10000
 						&& Zs[targetEnd + k] != 10000) {
 					pdbFile << "ATOM  ";				//record name
-					pdbFile << right << setw(5) << targetEnd + k; // atom serial number
+					pdbFile << right << setw(5) << queryEnd + k; // atom serial number
 					pdbFile << "  CA  "; //atom name
 					pdbFile << setw(3)
 							<< convertResidueName(
 									originalProteinSeq[queryEnd + k]);
-					pdbFile << right << setw(6) << targetEnd + k; // atom serial number
+					pdbFile << right << setw(6) << queryEnd + k; // atom serial number
 					pdbFile << "    ";
 					pdbFile << right << setw(8.3) << Xs[targetEnd + k];
 					pdbFile << right << setw(8.3) << Ys[targetEnd + k];
