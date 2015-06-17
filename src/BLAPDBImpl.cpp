@@ -409,16 +409,25 @@ void BLAPDBImpl::findLocalAlign() {
 		ofstream outJsonFile((char*) protein3DCorrdsFilename.c_str(), ios::out);
 		outJsonFile << "{\n";
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
+		int offset = 0;
 		for (int j = 0; j < subject.size(); j++) {
-			if (subject[j] == '-' || query[j] == '-') {
+			if (subject[j] == '-' || query[j] != '-') {
 				continue;
 				//outJsonFile << "\"" << subject[j - 1] << "\":\""
 				//	<< "10000,10000,10000\"\n";
+			} else if (subject[j] != '-' || query[j] == '-') {
+				offset++;
+				continue;
+			} else if (subject[j] == '-' || query[j] == '-') {
+				continue;
+
 			} else {
 
 				outJsonFile << "\"" << query[j] << "\":\""
-						<< Xs[subjectStart + j] << "," << Ys[subjectStart + j]
-						<< "," << Zs[subjectStart + j] << "\"\n";
+						<< Xs[subjectStart + offset - 1] << ","
+						<< Ys[subjectStart + offset - 1] << ","
+						<< Zs[subjectStart + offset - 1] << "\"\n";
+				offset++;
 			}
 
 		}
@@ -479,54 +488,73 @@ void BLAPDBImpl::write2PDB() {
 		ofstream pdbFile((char*) protein3DCorrdsFilename.c_str(), ios::out);
 
 		while (headMore > 0) {
-			if (Xs[subjectStart - headMore] != 10000
-					&& Ys[subjectStart - headMore] != 10000
-					&& Zs[subjectStart - headMore] != 10000) {
+			if (Xs[subjectStart - headMore - 1] != 10000
+					&& Ys[subjectStart - headMore - 1] != 10000
+					&& Zs[subjectStart - headMore - 1] != 10000) {
 				pdbFile << "ATOM  ";				//record name
 				pdbFile << right << setw(5) << subjectStart - headMore; // atom serial number
 				pdbFile << "  CA  "; //atom name
 				pdbFile << setw(3)
 						<< convertResidueName(
-								originalProteinSeq[queryStart - headMore]);
+								originalProteinSeq[queryStart - headMore - 1]);
 				//pdbFile<<templateSeq[subjectStart - headMore];//for debug
 				pdbFile << right << setw(6) << subjectStart - headMore; // atom serial number
 				pdbFile << "    ";
-				pdbFile << right << setw(8.3) << Xs[subjectStart - headMore];
-				pdbFile << right << setw(8.3) << Ys[subjectStart - headMore];
-				pdbFile << right << setw(8.3) << Zs[subjectStart - headMore];
+				pdbFile << right << setw(8.3)
+						<< Xs[subjectStart - headMore - 1];
+				pdbFile << right << setw(8.3)
+						<< Ys[subjectStart - headMore - 1];
+				pdbFile << right << setw(8.3)
+						<< Zs[subjectStart - headMore - 1];
 				pdbFile << "  1.00  0.00\n";
 			}
 
 			headMore--;
 		}
+
+		int queryPos = 1;
+		int subjectPos = 1;
 		for (int j = 0; j < subject.size(); j++) {
-			if (subject[j] == '-' || query[j] == '-') {
+			if (subject[j] == '-' || query[j] != '-') {
+				queryPos++;
 				continue;
 				//outJsonFile << "\"" << subject[j] << "\":\""
 				//	<< "10000,10000,10000\"\n";
+			} else if (subject[j] != '-' || query[j] == '-') {
+				subjectPos++;
+				continue;
+			} else if (subject[j] == '-' || query[j] == '-') {
+				continue;
 			} else {
-				if (Xs[subjectStart + j] != 10000
-						&& Ys[subjectStart + j] != 10000
-						&& Zs[subjectStart + j] != 10000) {
+				if (Xs[subjectStart + subjectPos - 2] != 10000
+						&& Ys[subjectStart + subjectPos - 2] != 10000
+						&& Zs[subjectStart + subjectPos - 2] != 10000) {
 					pdbFile << "ATOM  ";				//record name
-					pdbFile << right << setw(5) << subjectStart + j; // atom serial number
+					pdbFile << right << setw(5)
+							<< subjectStart + subjectPos - 1; // atom serial number
 					pdbFile << "  CA  "; //atom name
 					pdbFile << setw(3) << convertResidueName(query[j]);
 					//pdbFile<<query[ j - 1]; //for dubug
-					pdbFile << right << setw(6) << subjectStart + j; // atom serial number
+					pdbFile << right << setw(6)
+							<< subjectStart + subjectPos - 1; // atom serial number
 					pdbFile << "    ";
-					pdbFile << right << setw(8.3) << Xs[subjectStart + j];
-					pdbFile << right << setw(8.3) << Ys[subjectStart + j];
-					pdbFile << right << setw(8.3) << Zs[subjectStart + j];
+					pdbFile << right << setw(8.3)
+							<< Xs[subjectStart + subjectPos - 2];
+					pdbFile << right << setw(8.3)
+							<< Ys[subjectStart + subjectPos - 2];
+					pdbFile << right << setw(8.3)
+							<< Zs[subjectStart + subjectPos - 2];
 					pdbFile << "  1.00  0.00\n";
 				}
+				subjectPos++;
+				queryPos++;
 
 			}
 
 		}
 		//cout<<"Tailmore"<<tailMore<<endl;;
 		if (tailMore > 0) {
-			for (int k = 1; k <= tailMore; k++) {
+			for (int k = 0; k < tailMore; k++) {
 				if (Xs[subjectEnd + k] != 10000 && Ys[subjectEnd + k] != 10000
 						&& Zs[subjectEnd + k] != 10000) {
 					pdbFile << "ATOM  ";				//record name
@@ -606,30 +634,38 @@ void BLAPDBImpl::findGlobalAlign() {
 		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
 		while (headMore > 0) {
 
-			outJsonFile << "\"" << originalProteinSeq[queryStart - headMore]
-					<< "\":\"" << Xs[subjectStart - headMore] << ","
-					<< Ys[subjectStart - headMore] << ","
-					<< Zs[subjectStart - headMore] << "\"\n";
+			outJsonFile << "\"" << originalProteinSeq[queryStart - headMore - 1]
+					<< "\":\"" << Xs[subjectStart - headMore - 1] << ","
+					<< Ys[subjectStart - headMore - 1] << ","
+					<< Zs[subjectStart - headMore - 1] << "\"\n";
 
 			headMore--;
 		}
+		int offset = 0;
 		for (int j = 0; j < subject.size(); j++) {
-			if (subject[j] == '-' || query[j] == '-') {
+			if (subject[j] == '-' || query[j] != '-') {
 				continue;
 				//outJsonFile << "\"" << subject[j] << "\":\""
 				//	<< "10000,10000,10000\"\n";
+			} else if (subject[j] != '-' || query[j] == '-') {
+				offset++;
+				continue;
+			} else if (subject[j] == '-' || query[j] == '-') {
+				continue;
 			} else {
 
 				outJsonFile << "\"" << query[j] << "\":\""
-						<< Xs[subjectStart + j] << "," << Ys[subjectStart + j]
-						<< "," << Zs[subjectStart + j] << "\"\n";
+						<< Xs[subjectStart + offset - 1] << ","
+						<< Ys[subjectStart + offset - 1] << ","
+						<< Zs[subjectStart + offset - 1] << "\"\n";
+				offset++;
 
 			}
 
 		}
 		//cout<<"Tailmore"<<tailMore<<endl;;
 		if (tailMore > 0) {
-			for (int k = 1; k <= tailMore; k++) {
+			for (int k = 0; k < tailMore; k++) {
 
 				outJsonFile << "\"" << originalProteinSeq[queryEnd + k]
 						<< "\":\"" << Xs[subjectEnd + k] << ","
