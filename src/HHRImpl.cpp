@@ -536,7 +536,7 @@ void HHRImpl::write2PDB() {
 		} else {
 			tailMore = queryTailMore;
 		}
-		cout<<tailMore<<"tailmore"<<endl;
+		//cout<<tailMore<<"tailmore"<<endl;
 		string protein3DCorrdsFilename(outputFileLocation);
 		protein3DCorrdsFilename += "/";
 		protein3DCorrdsFilename += rootName;
@@ -568,37 +568,39 @@ void HHRImpl::write2PDB() {
 
 			headMore--;
 		}
-		int numberOfMinusign = 0;
+		int queryPos = 1;
+		int targetPos=1;
 
 		for (int j = 0; j < target.size(); j++) {
 
 			if (target[j] == '-' && query[j] != '-') {
-				numberOfMinusign++;
+				queryPos++;
 				continue;
 				//outJsonFile << "\"" << target[j-1] << "\":\""
 				//		<< "10000,10000,10000\"\n";
 			} else if (target[j] != '-' && query[j] == '-') {
-				numberOfMinusign++;
+				targetPos++;
 				continue;
 			} else if (target[j] == '-' && query[j] == '-') {
-				numberOfMinusign++;
 				continue;
 			} else {
-				if (Xs[targetStart + j - 1] != 10000
-						&& Ys[targetStart + j - 1] != 10000
-						&& Zs[targetStart + j - 1] != 10000) {
+				if (Xs[targetStart + targetPos - 2] != 10000
+						&& Ys[targetStart + targetPos - 2] != 10000
+						&& Zs[targetStart + targetPos - 2] != 10000) {
 					pdbFile << "ATOM  ";				//record name
-					pdbFile << right << setw(5) << queryStart + j-numberOfMinusign;	// atom serial number
+					pdbFile << right << setw(5) << queryStart + queryPos - 1;	// atom serial number
 					pdbFile << "  CA  ";				//atom name
 					pdbFile << setw(3) << convertResidueName(query[j]);
 					//pdbFile<<query[ j - 1]; //for dubug
-					pdbFile << right << setw(6) << queryStart + j-numberOfMinusign;	// atom serial number
+					pdbFile << right << setw(6) << queryStart + queryPos - 1;	// atom serial number
 					pdbFile << "    ";
-					pdbFile << right << setw(8.3) << Xs[targetStart + j - 1];
-					pdbFile << right << setw(8.3) << Ys[targetStart + j - 1];
-					pdbFile << right << setw(8.3) << Zs[targetStart + j - 1];
+					pdbFile << right << setw(8.3) << Xs[targetStart + targetPos - 2];
+					pdbFile << right << setw(8.3) << Ys[targetStart + targetPos - 2];
+					pdbFile << right << setw(8.3) << Zs[targetStart + targetPos - 2];
 					pdbFile << "  1.00  0.00\n";
 				}
+				targetPos++;
+				queryPos++;
 
 			}
 
