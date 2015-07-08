@@ -11,6 +11,7 @@
 
 #include "BLANRImpl.h"
 #include "BLAPDBImpl.h"
+#include "CNFSearchImpl.h"
 #include "HHRImpl.h"
 #include "HHRNRImpl.h"
 
@@ -67,6 +68,13 @@ int main(int argc, char* argv[]) {
 		//hhrNRImpl.setup3DCoords();
 		//hhrNRImpl.findLocalAlign();
 		//hhrNRImpl.findGlobalAlign();
+	}
+
+	if (strcmp(argv[1], "-cnfSearch") == 0) {
+		CNFSearchImpl cnfSearchImpl(argv[2]);
+		cnfSearchImpl.populateResultVector();
+		cnfSearchImpl.makeDirectory();
+		cnfSearchImpl.write2Json();
 	}
 
 	return 0;
