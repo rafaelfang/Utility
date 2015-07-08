@@ -1,5 +1,5 @@
-convert: jsoncpp.o AlignmentResult.o HHRNRImpl.o HHRNRResult.o HHRImpl.o HHRResult.o BLANRImpl.o BLANRResult.o BLAPDBImpl.o BLAPDBResult.o Driver.o UtilityInterface.o 
-	g++ jsoncpp.o AlignmentResult.o HHRNRImpl.o HHRNRResult.o HHRImpl.o HHRResult.o BLANRImpl.o BLANRResult.o BLAPDBImpl.o BLAPDBResult.o Driver.o UtilityInterface.o  -o convert
+convert: jsoncpp.o AlignmentResult.o CNFSearchResult.o CNFSearchImpl.o HHRNRImpl.o HHRNRResult.o HHRImpl.o HHRResult.o BLANRImpl.o BLANRResult.o BLAPDBImpl.o BLAPDBResult.o Driver.o UtilityInterface.o 
+	g++ jsoncpp.o AlignmentResult.o CNFSearchResult.o CNFSearchImpl.o HHRNRImpl.o HHRNRResult.o HHRImpl.o HHRResult.o BLANRImpl.o BLANRResult.o BLAPDBImpl.o BLAPDBResult.o Driver.o UtilityInterface.o  -o convert
 
 jsoncpp.o: jsoncpp.cpp
 	g++ -c jsoncpp.cpp
@@ -7,6 +7,12 @@ jsoncpp.o: jsoncpp.cpp
 AlignmentResult.o: AlignmentResult.cpp
 	g++ -c AlignmentResult.cpp
 	
+CNFSearchImpl.o: CNFSearchImpl.cpp
+	g++ -c CNFSearchImpl.cpp
+	
+CNFSearchResult.o: CNFSearchResult.cpp
+	g++ -c CNFSearchResult.cpp
+		
 HHRImpl.o: HHRImpl.cpp
 	g++ -c HHRImpl.cpp
 	
