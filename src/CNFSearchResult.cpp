@@ -40,14 +40,6 @@ void CNFSearchResult::setProteinName(string& proteinName) {
 	this->proteinName = proteinName;
 }
 
-bool CNFSearchResult::isSecondStateReached() {
-	return secondStateReached;
-}
-
-void CNFSearchResult::setSecondStateReached(bool secondStateReached) {
-	this->secondStateReached = secondStateReached;
-}
-
 string& CNFSearchResult::getSequenceAccConf() {
 	return sequenceAccConf;
 }
@@ -142,4 +134,12 @@ int CNFSearchResult::getTargetStart() {
 
 void CNFSearchResult::setTargetStart(int targetStart) {
 	this->targetStart = targetStart;
+}
+
+bool CNFSearchResult::isSecondStateReached() {
+	return secondStateReached;
+}
+
+void CNFSearchResult::setSecondStateReached(bool secondStateReached) {
+	this->secondStateReached = secondStateReached;
 }
