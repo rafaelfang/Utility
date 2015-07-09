@@ -13,6 +13,7 @@
 #include <cstring>
 #include <cwchar>
 #include <fstream>
+#include <iomanip>
 #include <iostream>
 #include <string>
 
@@ -226,7 +227,6 @@ void CNFSearchImpl::populateResultVector() {
 			result.setAlignmentPart(newAlignmentPart);
 			//cout<<result.getAlignmentPart()<<endl;
 
-
 			fgets(line, 500, fptr);
 			char sequenceAlignmentAppend[200];
 			char* pos4 = strstr(line, "S");
@@ -287,7 +287,6 @@ void CNFSearchImpl::populateResultVector() {
 
 			//first save the protein information to vector
 
-
 			cnfSearchResultVector.push_back(result);
 
 			//then update the information set the first state flag
@@ -309,7 +308,6 @@ void CNFSearchImpl::populateResultVector() {
 
 	}
 
-
 	cnfSearchResultVector.push_back(result);
 
 	fclose(fptr);
@@ -325,7 +323,7 @@ void CNFSearchImpl::write2Json() {
 	ofstream outputFile(outFilename.c_str());
 
 	outputFile << "{" << "\n";
-	for (int i = 0; i < cnfSearchResultVector.size(); i++) {
+	for (int i = 1; i < cnfSearchResultVector.size(); i++) {
 		outputFile << "\"protein" << i << "\":{\n";
 		outputFile << "\t\"proteinName\":\""
 				<< cnfSearchResultVector[i].getProteinName() << "\",\n";
@@ -369,13 +367,266 @@ void CNFSearchImpl::write2Json() {
 }
 
 void CNFSearchImpl::setup3DCoords() {
+	for (int i = 0; i < cnfSearchResultVector.size(); i++) {
+		string proteinDBFilename(DBInfoLocation);
+		proteinDBFilename += "/";
+		proteinDBFilename += cnfSearchResultVector[i].getProteinName();
+		proteinDBFilename += ".db";
+		FILE* fptr = fopen((char*) proteinDBFilename.c_str(), "r");
+		if (fptr == NULL) {
+			cout << proteinDBFilename << " can't open!" << endl;
+			continue;
+		}
+		char line[3000];
+		char proteinSeq[3000];
+		int seqLength;
+		vector<float> Xs;
+		vector<float> Ys;
+		vector<float> Zs;
+		vector<char> templateSeq;
+		while (fgets(line, 3000, fptr) != NULL) {
+			if (strstr(line, ">Reference Sequence Info:") != NULL) {
+				fgets(line, 3000, fptr);
+				sscanf(line, "%s", proteinSeq);
+				string s(proteinSeq);
+				seqLength = s.size();
+				templateSeq.resize(seqLength);
+				for (int j = 0; j < seqLength; j++) {
+					templateSeq[j] = s[j];
+				}
+				//cout<<seqLength<<endl;
+				continue;
+			}
+			if (strstr(line, ">Ca XYZ:") != NULL) {
+				Xs.resize(seqLength);
+				Ys.resize(seqLength);
+				Zs.resize(seqLength);
 
+				float temp;
+				//cout << proteinDBFilename << endl;
+				for (int j = 0; j < seqLength; j++) {
+					fscanf(fptr, "%f", &temp);
+					Xs[j] = temp;
+					//cout<< Xs[j] << " ";
+				}
+				//cout<<"==============X========"<<endl;
+				for (int j = 0; j < seqLength; j++) {
+					fscanf(fptr, "%f", &temp);
+					Ys[j] = temp;
+					//cout<< Ys[j] << " ";
+				}
+				//cout<<"==============Y========"<<endl;
+				for (int j = 0; j < seqLength; j++) {
+					fscanf(fptr, "%f", &temp);
+					Zs[j] = temp;
+					//cout<< Zs[j] << " ";
+				}
+				//cout<<"==============Z========"<<endl;
+				break;
+			}
+		}
+		fclose(fptr);
+		//cout << "---------" << seqLength << endl;
+		cnfSearchResultVector[i].setTemplateSeq(templateSeq);
+		cnfSearchResultVector[i].setXCoords(Xs);
+		cnfSearchResultVector[i].setYCoords(Ys);
+		cnfSearchResultVector[i].setZCoords(Zs);
+
+	}
 }
 void CNFSearchImpl::findLocalAlign() {
+	string proteinName;
+	int targetStart;
+	string targetAlignment;
+	string sequenceAlignment;
+	int targetEnd;
+	for (int i = 0; i < cnfSearchResultVector.size(); i++) {
+		proteinName = cnfSearchResultVector[i].getProteinName();
+		targetStart = cnfSearchResultVector[i].getTargetStart();
+		targetAlignment = cnfSearchResultVector[i].getTargetAlignment();
+		sequenceAlignment = cnfSearchResultVector[i].getSequenceAlignment();
+		targetEnd = cnfSearchResultVector[i].getTargetEnd();
+		vector<float> Xs = cnfSearchResultVector[i].getXCoords();
+		vector<float> Ys = cnfSearchResultVector[i].getYCoords();
+		vector<float> Zs = cnfSearchResultVector[i].getZCoords();
+		string protein3DCorrdsFilename(outputFileLocation);
+		protein3DCorrdsFilename += "/";
+		protein3DCorrdsFilename += rootName;
+		protein3DCorrdsFilename += "/HHR/local/";
+		protein3DCorrdsFilename += proteinName;
+		protein3DCorrdsFilename += "_";
+		protein3DCorrdsFilename += sequenceAlignment;
+		protein3DCorrdsFilename += ".json";
+		ofstream outJsonFile((char*) protein3DCorrdsFilename.c_str(), ios::out);
+		outJsonFile << "{\n";
+		outJsonFile << "\"proteinName\":\"" << proteinName << "\"\n";
 
+		int offset = 0;
+		for (int j = 0; j < sequenceAlignment.size(); j++) {
+			if (targetAlignment[j] == '-' && sequenceAlignment[j] != '-') {
+				continue;
+				//outJsonFile << "\"" << target[j-1] << "\":\""
+				//		<< "10000,10000,10000\"\n";
+			} else if (targetAlignment[j] != '-' && sequenceAlignment[j] == '-') {
+				offset++;
+				continue;
+			} else if (targetAlignment[j] == '-' && sequenceAlignment[j] == '-') {
+				continue;
+			} else {
+				outJsonFile << "\"" << sequenceAlignment[j] << "\":\""
+						<< Xs[targetStart + offset - 1] << ","
+						<< Ys[targetStart + offset - 1] << ","
+						<< Zs[targetStart + offset - 1] << "\"\n";
+				offset++;
+			}
+
+		}
+		outJsonFile << "}\n";
+		outJsonFile.close();
+
+	}
 }
 void CNFSearchImpl::write2PDB() {
 
+	string proteinName;
+	int targetStart;
+	string targetAlignment;
+	int targetEnd;
+	int sequenceStart;
+	string sequenceAlignment;
+	int sequenceEnd;
+	for (int i = 1; i < cnfSearchResultVector.size(); i++) {
+		proteinName = cnfSearchResultVector[i].getProteinName();
+		targetStart = cnfSearchResultVector[i].getTargetStart();
+		targetAlignment = cnfSearchResultVector[i].getTargetAlignment();
+		targetEnd = cnfSearchResultVector[i].getTargetEnd();
+		sequenceStart = cnfSearchResultVector[i].getSequenceStart();
+		sequenceAlignment = cnfSearchResultVector[i].getSequenceAlignment();
+		sequenceEnd = cnfSearchResultVector[i].getSequenceEnd();
+		cout << proteinName << endl;
+		//targetStart<<targetAlignment<<targetEnd<<sequenceStart<<sequenceAlignment<<sequenceEnd<<endl;
+		int targetHeadMore = targetStart - 1;
+		int targetTailMore = proteinSeqLength - targetEnd;
+		vector<float> Xs = cnfSearchResultVector[i].getXCoords();
+		vector<float> Ys = cnfSearchResultVector[i].getYCoords();
+		vector<float> Zs = cnfSearchResultVector[i].getZCoords();
+		vector<char> templateSeq = cnfSearchResultVector[i].getTemplateSeq();
+		int sequenceHeadMore = sequenceStart - 1;
+		int sequenceTailMore = Xs.size() - sequenceEnd;
+		int headMore = 0;
+		if (targetHeadMore > sequenceHeadMore) {
+			headMore = sequenceHeadMore;
+		} else {
+			headMore = targetHeadMore;
+		}
+
+		int tailMore = 0;
+		if (targetTailMore > sequenceTailMore) {
+			tailMore = sequenceTailMore;
+		} else {
+			tailMore = targetTailMore;
+		}
+		//cout<<tailMore<<"tailmore"<<endl;
+		string protein3DCorrdsFilename(outputFileLocation);
+		protein3DCorrdsFilename += "/";
+		protein3DCorrdsFilename += rootName;
+		protein3DCorrdsFilename += "/CNFSearch/pdbFiles/";
+		protein3DCorrdsFilename += proteinName;
+		protein3DCorrdsFilename += "_";
+		protein3DCorrdsFilename += sequenceAlignment;
+		protein3DCorrdsFilename += ".pdb";
+		ofstream pdbFile((char*) protein3DCorrdsFilename.c_str(), ios::out);
+
+		while (headMore > 0) {
+			if (Xs[targetStart - headMore - 1] != 10000
+					&& Ys[targetStart - headMore - 1] != 10000
+					&& Zs[targetStart - headMore - 1] != 10000) {
+				pdbFile << "ATOM  ";				//record name
+				pdbFile << right << setw(5) << sequenceStart - headMore; // atom serial number
+				pdbFile << "  CA  "; //atom name
+				pdbFile << setw(3)
+						<< convertResidueName(
+								originalProteinSeq[sequenceStart - headMore - 1]);
+				//pdbFile<<templateSeq[subjectStart - headMore];//for debug
+				pdbFile << right << setw(6) << sequenceStart - headMore; // atom serial number
+				pdbFile << "    ";
+				pdbFile << right << setw(8.3) << Xs[targetStart - headMore - 1];
+				pdbFile << right << setw(8.3) << Ys[targetStart - headMore - 1];
+				pdbFile << right << setw(8.3) << Zs[targetStart - headMore - 1];
+				pdbFile << "  1.00  0.00\n";
+			}
+
+			headMore--;
+		}
+		int targetPos = 1;
+		int sequencePos = 1;
+
+		for (int j = 0; j < targetAlignment.size(); j++) {
+
+			if (targetAlignment[j] == '-' && sequenceAlignment[j] != '-') {
+				sequencePos++;
+				continue;
+				//outJsonFile << "\"" << target[j-1] << "\":\""
+				//		<< "10000,10000,10000\"\n";
+			} else if (targetAlignment[j] != '-'
+					&& sequenceAlignment[j] == '-') {
+				targetPos++;
+				continue;
+			} else if (targetAlignment[j] == '-'
+					&& sequenceAlignment[j] == '-') {
+				continue;
+			} else {
+				if (Xs[targetStart + targetPos - 2] != 10000
+						&& Ys[targetStart + targetPos - 2] != 10000
+						&& Zs[targetStart + targetPos - 2] != 10000) {
+					pdbFile << "ATOM  ";				//record name
+					pdbFile << right << setw(5)
+							<< sequenceStart + sequencePos - 1;	// atom serial number
+					pdbFile << "  CA  ";				//atom name
+					pdbFile << setw(3)
+							<< convertResidueName(sequenceAlignment[j]);
+					//pdbFile<<query[ j - 1]; //for dubug
+					pdbFile << right << setw(6)
+							<< sequenceStart + sequencePos - 1;	// atom serial number
+					pdbFile << "    ";
+					pdbFile << right << setw(8.3)
+							<< Xs[targetStart + targetPos - 2];
+					pdbFile << right << setw(8.3)
+							<< Ys[targetStart + targetPos - 2];
+					pdbFile << right << setw(8.3)
+							<< Zs[targetStart + targetPos - 2];
+					pdbFile << "  1.00  0.00\n";
+				}
+				targetPos++;
+				sequencePos++;
+
+			}
+
+		}
+		if (tailMore > 0) {
+			for (int k = 0; k < tailMore; k++) {
+				if (Xs[targetEnd + k] != 10000 && Ys[targetEnd + k] != 10000
+						&& Zs[targetEnd + k] != 10000) {
+					pdbFile << "ATOM  ";				//record name
+					pdbFile << right << setw(5) << sequenceEnd + k; // atom serial number
+					pdbFile << "  CA  "; //atom name
+					pdbFile << setw(3)
+							<< convertResidueName(
+									originalProteinSeq[sequenceEnd + k]);
+					pdbFile << right << setw(6) << sequenceEnd + k; // atom serial number
+					pdbFile << "    ";
+					pdbFile << right << setw(8.3) << Xs[targetEnd + k];
+					pdbFile << right << setw(8.3) << Ys[targetEnd + k];
+					pdbFile << right << setw(8.3) << Zs[targetEnd + k];
+					pdbFile << "  1.00  0.00\n";
+				}
+
+			}
+		}
+
+		pdbFile << "TER\n";
+		pdbFile.close();
+	}
 }
 void CNFSearchImpl::findGlobalAlign() {
 
