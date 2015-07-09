@@ -24,8 +24,7 @@ public:
 	void setFirstStateReached(bool firstStateReached);
 	string& getProteinName();
 	void setProteinName(string& proteinName);
-	bool isSecondStateReached();
-	void setSecondStateReached(bool secondStateReached);
+
 	string& getSequenceAccConf();
 	void setSequenceAccConf(string& sequenceAccConf);
 	string& getSequenceAccPred();
@@ -50,6 +49,8 @@ public:
 	void setTargetSseReal(string& targetSseReal);
 	int getTargetStart();
 	void setTargetStart(int targetStart);
+	bool isSecondStateReached() ;
+	void setSecondStateReached(bool secondStateReached);
 
 private:
 	bool firstStateReached;
