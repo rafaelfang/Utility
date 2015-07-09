@@ -75,6 +75,10 @@ int main(int argc, char* argv[]) {
 		cnfSearchImpl.populateResultVector();
 		cnfSearchImpl.makeDirectory();
 		cnfSearchImpl.write2Json();
+		//cnfSearchImpl.setup3DCoords();
+		//cnfSearchImpl.findLocalAlign();
+		//cnfSearchImpl.findGlobalAlign();
+		//cnfSearchImpl.write2PDB();
 	}
 
 	return 0;
