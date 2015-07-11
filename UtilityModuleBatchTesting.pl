@@ -17,6 +17,7 @@ foreach $line(@lines) {
 	$cmd2 = "./convert -blaNR $line";
 	$cmd3 = "./convert -hhr $line";
 	$cmd4 = "./convert -hhrNR $line";
+	$cmd5 = "./convert -cnfSearch $line";
 
 	$start_run = time();
 	print $cmd1."\n";
@@ -27,6 +28,8 @@ foreach $line(@lines) {
 	system($cmd3);
 	print $cmd4."\n";
 	system($cmd4);
+	print $cmd5."\n";
+	system($cmd5);
 	$end_run = time();
 	$run_time = $end_run - $start_run;
 	print FILE2 "$line running time: $run_time \n";
