@@ -111,13 +111,18 @@ void BLAPDBImpl::populateResultVector() {
 			int positives;
 			sscanf(pos2 + 1, "%d", &positives);
 			result.setPositives(positives);
-			char* pos3 = strstr(pos2 + 1, "(");
+
+			char* pos3 = strstr(pos2 + 1, "=");
 			if (pos3 == NULL) {
-				//there is no gaps
+				result.setGapNum(0);
 				result.setGaps(0);
 			} else {
+				int gapNum;
+				sscanf(pos3 + 1, "%d", &gapNum);
+				result.setGapNum(gapNum);
 				int gaps;
-				sscanf(pos3 + 1, "%d", &gaps);
+				char* pos4 = strstr(pos3 + 1, "(");
+				sscanf(pos4 + 1, "%d", &gaps);
 				result.setGaps(gaps);
 			}
 
@@ -290,11 +295,16 @@ void BLAPDBImpl::write2Json() {
 		outputFile << "\t\"Expect\":\"" << blaPDBResultVector[i].getExpect()
 				<< "\",\n";
 		outputFile << "\t\"Identities\":\""
-				<< blaPDBResultVector[i].getIdentities() << "\",\n";
+				<< blaPDBResultVector[i].getIdentities() << "%\",\n";
 		outputFile << "\t\"Positives\":\""
-				<< blaPDBResultVector[i].getPositives() << "\",\n";
+				<< blaPDBResultVector[i].getPositives() << "%\",\n";
 		outputFile << "\t\"Gaps\":\"" << blaPDBResultVector[i].getGaps()
-				<< "\",\n";
+				<< "%\",\n";
+		outputFile << "\t\"CoveragePercentage\":\""
+				<< (blaPDBResultVector[i].getSubjectEnd()
+						- blaPDBResultVector[i].getSubjectStart() + 1
+						- blaPDBResultVector[i].getGapNum())
+						/ (proteinSeqLength) << "%\",\n";
 		outputFile << "\t\"QueyStart\":\""
 				<< blaPDBResultVector[i].getQueryStart() << "\",\n";
 		outputFile << "\t\"Query\":\"" << blaPDBResultVector[i].getQuery()
