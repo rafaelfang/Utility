@@ -7,6 +7,8 @@
 
 #include "BLAPDBResult.h"
 
+#include <string>
+
 BLAPDBResult::BLAPDBResult() :
 		AlignmentResult() {
 
@@ -150,4 +152,12 @@ string& BLAPDBResult::getProteinName() {
 
 void BLAPDBResult::setProteinName(string& proteinName) {
 	this->proteinName = proteinName;
+}
+
+int BLAPDBResult::getGapNum()  {
+	return gapNum;
+}
+
+void BLAPDBResult::setGapNum(int gapNum) {
+	this->gapNum = gapNum;
 }
