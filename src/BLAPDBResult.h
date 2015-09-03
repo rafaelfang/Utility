@@ -53,6 +53,8 @@ public:
 	void setThirdStateReached(bool);
 	string& getProteinName();
 	void setProteinName(string& proteinName);
+	int getGapNum();
+	void setGapNum(int gapNum);
 
 private:
 	//the first state
@@ -69,6 +71,7 @@ private:
 	int identities;
 	int positives;
 	int gaps;
+	int gapNum;
 	bool secondStateReached;
 
 	//the third state is query ,alignment and subject
@@ -80,7 +83,6 @@ private:
 	string subject;
 	int subjectEnd;
 	bool thirdStateReached;
-
 
 };
 
