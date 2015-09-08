@@ -301,9 +301,9 @@ void BLAPDBImpl::write2Json() {
 		outputFile << "\t\"Gaps\":\"" << blaPDBResultVector[i].getGaps()
 				<< "%\",\n";
 		outputFile << "\t\"CoveragePercentage\":\""
-				<< (blaPDBResultVector[i].getSubjectEnd()
+				<< double((blaPDBResultVector[i].getSubjectEnd()
 						- blaPDBResultVector[i].getSubjectStart() + 1
-						- blaPDBResultVector[i].getGapNum())
+						- blaPDBResultVector[i].getGapNum()))
 						/ (proteinSeqLength) << "%\",\n";
 		outputFile << "\t\"QueyStart\":\""
 				<< blaPDBResultVector[i].getQueryStart() << "\",\n";
